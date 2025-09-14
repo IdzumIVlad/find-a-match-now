@@ -6,16 +6,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Send } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ApplicationFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   jobTitle: string;
   companyName: string;
+  employerEmail: string;
 }
 
-export const ApplicationForm = ({ open, onOpenChange, jobTitle, companyName }: ApplicationFormProps) => {
+export const ApplicationForm = ({ open, onOpenChange, jobTitle, companyName, employerEmail }: ApplicationFormProps) => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,7 +27,7 @@ export const ApplicationForm = ({ open, onOpenChange, jobTitle, companyName }: A
     resume: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email) {
       toast({
@@ -35,22 +38,45 @@ export const ApplicationForm = ({ open, onOpenChange, jobTitle, companyName }: A
       return;
     }
 
-    // В реальном приложении здесь будет отправка на backend
-    console.log("Application submitted:", formData);
-    
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      coverLetter: "",
-      resume: "",
-    });
-    onOpenChange(false);
-    
-    toast({
-      title: "Отклик отправлен!",
-      description: `Ваш отклик на вакансию "${jobTitle}" успешно отправлен в ${companyName}`,
-    });
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-application', {
+        body: {
+          ...formData,
+          jobTitle,
+          companyName,
+          employerEmail,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        coverLetter: "",
+        resume: "",
+      });
+      onOpenChange(false);
+      
+      toast({
+        title: "Отклик отправлен!",
+        description: `Ваш отклик на вакансию "${jobTitle}" успешно отправлен в ${companyName}`,
+      });
+    } catch (error) {
+      console.error("Error sending application:", error);
+      toast({
+        title: "Ошибка отправки",
+        description: "Не удалось отправить отклик. Попробуйте еще раз.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -130,13 +156,14 @@ export const ApplicationForm = ({ open, onOpenChange, jobTitle, companyName }: A
           </div>
 
           <div className="flex gap-2 pt-4">
-            <Button type="submit" className="flex-1">
-              Отправить отклик
+            <Button type="submit" className="flex-1" disabled={isSubmitting}>
+              {isSubmitting ? "Отправляется..." : "Отправить отклик"}
             </Button>
             <Button 
               type="button" 
               variant="outline" 
               onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
             >
               Отмена
             </Button>

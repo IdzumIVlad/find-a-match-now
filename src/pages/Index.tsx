@@ -185,6 +185,7 @@ const Index = () => {
           onOpenChange={setShowApplicationForm}
           jobTitle={selectedJob.title}
           companyName={selectedJob.company}
+          employerEmail={selectedJob.email}
         />
       )}
     </div>
