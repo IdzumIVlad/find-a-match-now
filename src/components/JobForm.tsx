@@ -1,0 +1,183 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { Plus } from "lucide-react";
+
+interface JobFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (job: any) => void;
+}
+
+export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    title: "",
+    company: "",
+    location: "",
+    salary: "",
+    type: "",
+    description: "",
+    email: "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title || !formData.company || !formData.email) {
+      toast({
+        title: "Ошибка",
+        description: "Пожалуйста, заполните все обязательные поля",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newJob = {
+      ...formData,
+      id: Date.now().toString(),
+      postedDate: new Date().toLocaleDateString("ru-RU"),
+    };
+
+    onSubmit(newJob);
+    setFormData({
+      title: "",
+      company: "",
+      location: "",
+      salary: "",
+      type: "",
+      description: "",
+      email: "",
+    });
+    onOpenChange(false);
+    
+    toast({
+      title: "Успешно!",
+      description: "Вакансия успешно размещена",
+    });
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Plus className="w-5 h-5 text-primary" />
+            Разместить вакансию
+          </DialogTitle>
+          <DialogDescription>
+            Заполните информацию о вакансии. Поля отмеченные * обязательны для заполнения.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Должность *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => handleInputChange("title", e.target.value)}
+                placeholder="Frontend разработчик"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="company">Компания *</Label>
+              <Input
+                id="company"
+                value={formData.company}
+                onChange={(e) => handleInputChange("company", e.target.value)}
+                placeholder="ООО Технологии"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="location">Местоположение</Label>
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={(e) => handleInputChange("location", e.target.value)}
+                placeholder="Москва, удаленно"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="salary">Зарплата</Label>
+              <Input
+                id="salary"
+                value={formData.salary}
+                onChange={(e) => handleInputChange("salary", e.target.value)}
+                placeholder="от 100 000 ₽"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="type">Тип занятости</Label>
+            <Select value={formData.type} onValueChange={(value) => handleInputChange("type", value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите тип занятости" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Полная занятость">Полная занятость</SelectItem>
+                <SelectItem value="Частичная занятость">Частичная занятость</SelectItem>
+                <SelectItem value="Стажировка">Стажировка</SelectItem>
+                <SelectItem value="Проектная работа">Проектная работа</SelectItem>
+                <SelectItem value="Удаленная работа">Удаленная работа</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email для откликов *</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              placeholder="hr@company.com"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Описание вакансии</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              placeholder="Опишите требования, обязанности и условия работы..."
+              rows={4}
+            />
+          </div>
+
+          <div className="flex gap-2 pt-4">
+            <Button type="submit" className="flex-1">
+              Разместить вакансию
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+            >
+              Отмена
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
