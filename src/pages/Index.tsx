@@ -28,8 +28,10 @@ const Index = () => {
   useEffect(() => {
     if (!authLoading && user && !profile) {
       setShowCompleteProfile(true);
+    } else if (profile) {
+      // Если профиль есть, убираем модальное окно
+      setShowCompleteProfile(false);
     }
-    // Remove automatic redirect to dashboard - let guests view vacancies
   }, [user, profile, authLoading]);
 
   // Загрузка вакансий из Supabase (безопасно, без скрытых данных)

@@ -47,15 +47,15 @@ const CompleteProfileModal = ({ open, onClose }: CompleteProfileModalProps) => {
         description: error.message,
         variant: "destructive",
       });
+      setLoading(false);
     } else {
       toast({
         title: "Профиль создан",
         description: "Ваш профиль успешно создан",
       });
-      onClose();
+      // Не закрываем модальное окно сразу - позволяем useEffect в Index.tsx обработать обновление профиля
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
