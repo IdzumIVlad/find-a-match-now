@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
+import { useTranslation } from 'react-i18next';
 
-const Dashboard = () => {
+const DashboardContent = () => {
   const { profile, loading } = useAuth();
   const navigate = useNavigate();
+  const { t, ready } = useTranslation();
 
   useEffect(() => {
     if (!loading && profile) {
@@ -17,10 +19,10 @@ const Dashboard = () => {
     }
   }, [profile, loading, navigate]);
 
-  if (loading) {
+  if (loading || !ready) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-muted-foreground">Загрузка...</div>
+        <div className="text-muted-foreground">{ready ? t('common.loading') : 'Loading...'}</div>
       </div>
     );
   }
@@ -31,7 +33,7 @@ const Dashboard = () => {
         <Card>
           <CardContent className="py-12 text-center">
             <div className="text-muted-foreground">
-              Профиль не найден. Пожалуйста, завершите регистрацию.
+              Profile not found. Please complete registration.
             </div>
           </CardContent>
         </Card>
@@ -41,8 +43,16 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-muted-foreground">Перенаправление...</div>
+      <div className="text-muted-foreground">Redirecting...</div>
     </div>
+  );
+};
+
+const Dashboard = () => {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><div>Loading...</div></div>}>
+      <DashboardContent />
+    </Suspense>
   );
 };
 

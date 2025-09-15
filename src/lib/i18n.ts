@@ -298,6 +298,10 @@ i18n
     
     ns: ['common', 'home', 'auth', 'footer'],
     defaultNS: 'common',
+    
+    react: {
+      useSuspense: true,
+    },
   });
 
 export default i18n;

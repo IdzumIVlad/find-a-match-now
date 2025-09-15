@@ -47,7 +47,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const fetchProfile = async () => {
+    console.log('fetchProfile called, user:', user?.id);
     if (!user?.id) {
+      console.log('No user ID, setting profile to null');
       setProfile(null);
       return;
     }
@@ -65,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
+      console.log('Profile fetched:', data);
       setProfile(data || null);
     } catch (error) {
       console.error('Unexpected error fetching profile:', error);
