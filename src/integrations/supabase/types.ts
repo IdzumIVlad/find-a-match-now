@@ -73,6 +73,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "applications_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "applications_vacancy_id_fkey"
             columns: ["vacancy_id"]
             isOneToOne: false
@@ -412,6 +419,36 @@ export type Database = {
         }
         Relationships: []
       }
+      resumes_public_safe: {
+        Row: {
+          created_at: string | null
+          education: Json | null
+          experience: Json | null
+          id: string | null
+          skills: string[] | null
+          summary: string | null
+          views: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          education?: Json | null
+          experience?: Json | null
+          id?: string | null
+          skills?: string[] | null
+          summary?: string | null
+          views?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          education?: Json | null
+          experience?: Json | null
+          id?: string | null
+          skills?: string[] | null
+          summary?: string | null
+          views?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_job_contact_info: {
@@ -457,11 +494,9 @@ export type Database = {
       get_public_resumes_safe: {
         Args: Record<PropertyKey, never>
         Returns: {
-          candidate_id: string
           created_at: string
           education: Json
           experience: Json
-          full_name: string
           id: string
           skills: string[]
           summary: string
