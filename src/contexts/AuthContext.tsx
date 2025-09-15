@@ -47,8 +47,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const fetchProfile = async () => {
-    if (!user) {
-      console.log('No user found, clearing profile');
+    if (!user?.id) {
+      console.log('No user ID found, clearing profile');
       setProfile(null);
       return;
     }
@@ -68,13 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
-      if (data) {
-        console.log('Profile found:', data);
-        setProfile(data);
-      } else {
-        console.log('No profile found for user:', user.id);
-        setProfile(null);
-      }
+      console.log('Profile query result:', data);
+      setProfile(data || null);
     } catch (error) {
       console.error('Unexpected error fetching profile:', error);
       setProfile(null);
@@ -96,12 +91,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         
+        console.log('Initial session check:', !!session?.user, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Если есть пользователь, сразу загружаем профиль
         if (session?.user) {
-          console.log('Initial session found, fetching profile for user:', session.user.id);
-          await fetchProfile();
+          console.log('Initial user found, loading profile immediately');
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .maybeSingle();
+            
+            if (profileError) {
+              console.error('Initial profile fetch error:', profileError);
+            } else {
+              console.log('Initial profile loaded:', profileData);
+              setProfile(profileData || null);
+            }
+          } catch (err) {
+            console.error('Initial profile fetch unexpected error:', err);
+          }
         }
         
         setLoading(false);
@@ -116,27 +128,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth state change:', event, session?.user?.id);
+        console.log('Auth state change:', event, !!session?.user);
         
         setSession(session);
         setUser(session?.user ?? null);
         
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          if (session?.user) {
-            console.log('User signed in, fetching profile for user:', session.user.id);
-            // Небольшая задержка для завершения авторизации
-            setTimeout(async () => {
-              if (mounted) {
-                await fetchProfile();
-              }
-            }, 100);
+        if (event === 'SIGNED_IN' && session?.user) {
+          console.log('User signed in, fetching profile');
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .maybeSingle();
+            
+            if (profileError) {
+              console.error('Sign-in profile fetch error:', profileError);
+            } else {
+              console.log('Sign-in profile loaded:', profileData);
+              setProfile(profileData || null);
+            }
+          } catch (err) {
+            console.error('Sign-in profile fetch unexpected error:', err);
           }
         } else if (event === 'SIGNED_OUT') {
+          console.log('User signed out, clearing profile');
           setProfile(null);
-        }
-        
-        if (!loading) {
-          setLoading(false);
         }
       }
     );
