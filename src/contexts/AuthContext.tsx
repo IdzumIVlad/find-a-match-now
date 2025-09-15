@@ -48,12 +48,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async () => {
     if (!user?.id) {
-      console.log('No user ID found, clearing profile');
       setProfile(null);
       return;
     }
-    
-    console.log('Fetching profile for user:', user.id);
     
     try {
       const { data, error } = await supabase
@@ -68,7 +65,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
-      console.log('Profile query result:', data);
       setProfile(data || null);
     } catch (error) {
       console.error('Unexpected error fetching profile:', error);
@@ -79,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    // Get initial session
+    // Get initial session and set up auth listener
     const initializeAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -87,32 +83,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (error) {
           console.error('Error getting session:', error);
-          setLoading(false);
-          return;
-        }
-        
-        console.log('Initial session check:', !!session?.user, session?.user?.id);
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Если есть пользователь, сразу загружаем профиль
-        if (session?.user) {
-          console.log('Initial user found, loading profile immediately');
-          try {
-            const { data: profileData, error: profileError } = await supabase
+        } else {
+          console.log('Initial session check:', !!session?.user);
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          // Load profile if user exists
+          if (session?.user) {
+            const { data: profileData } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
               .maybeSingle();
             
-            if (profileError) {
-              console.error('Initial profile fetch error:', profileError);
-            } else {
-              console.log('Initial profile loaded:', profileData);
-              setProfile(profileData || null);
-            }
-          } catch (err) {
-            console.error('Initial profile fetch unexpected error:', err);
+            console.log('Initial profile loaded:', !!profileData);
+            setProfile(profileData || null);
           }
         }
         
@@ -128,33 +113,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth state change:', event, !!session?.user);
+        console.log('Auth state change:', event);
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (event === 'SIGNED_IN' && session?.user) {
-          console.log('User signed in, fetching profile');
-          try {
-            const { data: profileData, error: profileError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .maybeSingle();
-            
-            if (profileError) {
-              console.error('Sign-in profile fetch error:', profileError);
-            } else {
-              console.log('Sign-in profile loaded:', profileData);
-              setProfile(profileData || null);
-            }
-          } catch (err) {
-            console.error('Sign-in profile fetch unexpected error:', err);
-          }
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
+          
+          setProfile(profileData || null);
         } else if (event === 'SIGNED_OUT') {
-          console.log('User signed out, clearing profile');
           setProfile(null);
         }
+        
+        setLoading(false);
       }
     );
 
