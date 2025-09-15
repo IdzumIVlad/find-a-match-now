@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import VacancyDetail from "./pages/VacancyDetail";
+import ResumeDetail from "./pages/ResumeDetail";
 import Employer from "./pages/Employer";
 import Candidate from "./pages/Candidate";
 import NotFound from "./pages/NotFound";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/vacancies/:id" element={<VacancyDetail />} />
+            <Route path="/resumes/:id" element={<ResumeDetail />} />
             <Route 
               path="/dashboard" 
               element={

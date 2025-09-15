@@ -3,11 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import Header from '@/components/Header';
+import ResumeForm from '@/components/ResumeForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, MapPin, DollarSign, Clock } from 'lucide-react';
+import { Plus, MapPin, DollarSign, Clock, Edit, Eye, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface Application {
   id: string;
@@ -25,17 +28,24 @@ interface Application {
 
 interface Resume {
   id: string;
+  candidate_id: string;
   full_name: string;
+  email: string;
+  phone: string;
   summary: string;
   skills: string[];
-  created_at: string;
+  experience: any[];
+  education: any[];
   views: number;
+  created_at: string;
 }
 
 const Candidate = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
+  const [resumeFormOpen, setResumeFormOpen] = useState(false);
+  const [editingResume, setEditingResume] = useState<Resume | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -69,7 +79,11 @@ const Candidate = () => {
       if (resumesError) throw resumesError;
 
       setApplications(applicationsData || []);
-      setResumes(resumesData || []);
+      setResumes((resumesData || []).map(resume => ({
+        ...resume,
+        experience: resume.experience as any[],
+        education: resume.education as any[]
+      })));
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -94,6 +108,45 @@ const Candidate = () => {
     return new Date(dateString).toLocaleDateString('ru-RU');
   };
 
+  const handleCreateResume = () => {
+    setEditingResume(null);
+    setResumeFormOpen(true);
+  };
+
+  const handleEditResume = (resume: Resume) => {
+    setEditingResume(resume);
+    setResumeFormOpen(true);
+  };
+
+  const handleDeleteResume = async (resumeId: string) => {
+    try {
+      const { error } = await supabase
+        .from('resumes')
+        .delete()
+        .eq('id', resumeId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Успешно",
+        description: "Резюме удалено",
+      });
+
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting resume:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить резюме",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResumeFormSubmit = () => {
+    fetchData();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -115,7 +168,7 @@ const Candidate = () => {
             <h1 className="text-3xl font-bold">Кабинет соискателя</h1>
             <p className="text-muted-foreground">Управляйте резюме и отслеживайте отклики</p>
           </div>
-          <Button>
+          <Button onClick={handleCreateResume}>
             <Plus className="w-4 h-4 mr-2" />
             Создать резюме
           </Button>
@@ -198,7 +251,7 @@ const Candidate = () => {
                   <div className="text-muted-foreground mb-4">
                     У вас пока нет созданных резюме
                   </div>
-                  <Button>
+                  <Button onClick={handleCreateResume}>
                     <Plus className="w-4 h-4 mr-2" />
                     Создать первое резюме
                   </Button>
@@ -238,12 +291,42 @@ const Candidate = () => {
                         </div>
                       )}
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditResume(resume)}
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
                           Редактировать
                         </Button>
-                        <Button variant="outline" size="sm">
-                          Просмотреть
+                        <Button variant="outline" size="sm" asChild>
+                          <Link to={`/resumes/${resume.id}`}>
+                            <Eye className="w-4 h-4 mr-1" />
+                            Просмотреть
+                          </Link>
                         </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Удалить
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Удалить резюме?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Это действие нельзя отменить. Резюме будет удалено навсегда.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Отмена</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteResume(resume.id)}>
+                                Удалить
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </CardContent>
                   </Card>
@@ -253,6 +336,13 @@ const Candidate = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <ResumeForm
+        open={resumeFormOpen}
+        onOpenChange={setResumeFormOpen}
+        onSubmit={handleResumeFormSubmit}
+        resume={editingResume}
+      />
     </div>
   );
 };
