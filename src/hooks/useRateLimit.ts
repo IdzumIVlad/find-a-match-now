@@ -1,41 +1,34 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-// Простая функция для хеширования IP
-const hashString = async (str: string): Promise<string> => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(str + 'SALT_SECRET_KEY'); // В продакшене использовать настоящий соль
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-};
-
 export const useRateLimit = () => {
   const [isBlocked, setIsBlocked] = useState(false);
 
   const checkRateLimit = useCallback(async (vacancyId: string): Promise<boolean> => {
     try {
-      // Получаем IP адрес пользователя (в продакшене через заголовки)
-      const userAgent = navigator.userAgent;
-      const ipHash = await hashString('127.0.0.1'); // В продакшене получать реальный IP
+      // Generate a session ID for tracking
+      const sessionId = sessionStorage.getItem('session_id') || 
+        (() => {
+          const id = Math.random().toString(36).substring(2, 15);
+          sessionStorage.setItem('session_id', id);
+          return id;
+        })();
 
-      // Проверяем, есть ли заявки за последние 10 минут
-      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
-      
-      const { data, error } = await supabase
-        .from('apply_audit')
-        .select('id')
-        .eq('vacancy_id', vacancyId)
-        .eq('ip_hash', ipHash)
-        .gte('created_at', tenMinutesAgo)
-        .limit(1);
+      // Call secure server-side rate limiting
+      const { data, error } = await supabase.functions.invoke('secure-rate-limit', {
+        body: {
+          vacancyId,
+          userAgent: navigator.userAgent,
+          sessionId
+        }
+      });
 
       if (error) {
         console.error('Rate limit check failed:', error);
-        return false; // В случае ошибки разрешаем заявку
+        return false; // Allow application on error to avoid blocking legitimate users
       }
 
-      const blocked = (data && data.length > 0);
+      const blocked = data?.blocked || false;
       setIsBlocked(blocked);
       
       return blocked;
@@ -45,26 +38,10 @@ export const useRateLimit = () => {
     }
   }, []);
 
+  // Deprecated - recording is now handled server-side
   const recordApplication = useCallback(async (vacancyId: string, userId?: string) => {
-    try {
-      const userAgent = navigator.userAgent;
-      const ipHash = await hashString('127.0.0.1'); // В продакшене получать реальный IP
-
-      const { error } = await supabase
-        .from('apply_audit')
-        .insert({
-          vacancy_id: vacancyId,
-          user_id: userId || null,
-          ip_hash: ipHash,
-          user_agent: userAgent
-        });
-
-      if (error) {
-        console.error('Failed to record application audit:', error);
-      }
-    } catch (error) {
-      console.error('Error recording application audit:', error);
-    }
+    // This function is now handled automatically by the server
+    console.log('Application recording is now handled server-side');
   }, []);
 
   return { checkRateLimit, recordApplication, isBlocked };

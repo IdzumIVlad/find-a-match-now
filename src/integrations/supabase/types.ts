@@ -86,6 +86,7 @@ export type Database = {
           created_at: string
           id: string
           ip_hash: string | null
+          session_id: string | null
           user_agent: string | null
           user_id: string | null
           vacancy_id: string
@@ -94,6 +95,7 @@ export type Database = {
           created_at?: string
           id?: string
           ip_hash?: string | null
+          session_id?: string | null
           user_agent?: string | null
           user_id?: string | null
           vacancy_id: string
@@ -102,6 +104,7 @@ export type Database = {
           created_at?: string
           id?: string
           ip_hash?: string | null
+          session_id?: string | null
           user_agent?: string | null
           user_id?: string | null
           vacancy_id?: string
@@ -373,6 +376,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_job_contact_info: {
+        Args: { job_id_param: string }
+        Returns: {
+          employer_email: string
+        }[]
+      }
       get_job_employer_email: {
         Args: { job_id: string }
         Returns: string
@@ -390,6 +399,52 @@ export type Database = {
           salary: string
           title: string
           updated_at: string
+        }[]
+      }
+      get_public_jobs_safe: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          company_name: string
+          created_at: string
+          description: string
+          employment_type: string
+          id: string
+          location: string
+          requirements: string
+          salary: string
+          title: string
+          updated_at: string
+        }[]
+      }
+      get_public_resumes_safe: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          candidate_id: string
+          created_at: string
+          education: Json
+          experience: Json
+          full_name: string
+          id: string
+          skills: string[]
+          summary: string
+          views: number
+        }[]
+      }
+      get_resume_details: {
+        Args: { resume_id_param: string }
+        Returns: {
+          candidate_id: string
+          created_at: string
+          education: Json
+          email: string
+          experience: Json
+          full_name: string
+          id: string
+          phone: string
+          raw_text: string
+          skills: string[]
+          summary: string
+          views: number
         }[]
       }
     }

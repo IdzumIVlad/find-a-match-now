@@ -15,8 +15,6 @@ import { Link } from 'react-router-dom';
 interface Resume {
   id: string;
   full_name: string;
-  email: string;
-  phone: string;
   summary: string;
   skills: string[];
   views: number;
@@ -77,10 +75,9 @@ const Resumes = () => {
 
   const fetchResumes = async () => {
     try {
+      // Use secure function that doesn't expose PII for public access
       const { data, error } = await supabase
-        .from('resumes')
-        .select('id, full_name, email, phone, summary, skills, views, created_at')
-        .order('created_at', { ascending: false });
+        .rpc('get_public_resumes_safe');
 
       if (error) throw error;
 
@@ -259,16 +256,9 @@ const Resumes = () => {
                             {resume.full_name}
                           </CardTitle>
                         </Link>
-                        <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                          <Mail className="w-4 h-4" />
-                          {resume.email}
+                        <div className="mt-2 text-sm text-muted-foreground">
+                          Контактные данные доступны авторизованным работодателям
                         </div>
-                        {resume.phone && (
-                          <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
-                            <Phone className="w-4 h-4" />
-                            {resume.phone}
-                          </div>
-                        )}
                       </div>
                       <div className="flex items-center text-muted-foreground text-sm">
                         <Eye className="w-4 h-4 mr-1" />

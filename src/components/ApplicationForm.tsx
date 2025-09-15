@@ -51,7 +51,7 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
       return;
     }
 
-    // Проверка rate limiting
+    // Проверка rate limiting с использованием серверной функции
     const rateLimited = await checkRateLimit(jobId);
     if (rateLimited) {
       toast({
@@ -69,24 +69,19 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
     setTimeout(() => setButtonDisabled(false), 10000);
 
     try {
-      // Получаем email работодателя через безопасную функцию
-      const { data: employerEmail, error: emailError } = await supabase
-        .rpc('get_job_employer_email', { job_id: jobId });
-
-      if (emailError) {
-        throw emailError;
-      }
-
-      if (!employerEmail) {
-        throw new Error('Не удалось получить email работодателя');
-      }
-
+      // Получаем email работодателя через безопасную серверную функцию
+      // Эта функция требует service_role и вызывается только из edge function
+      
       const { data, error } = await supabase.functions.invoke('send-application', {
         body: {
-          ...formData,
+          jobId: jobId,
           jobTitle,
           companyName,
-          employerEmail,
+          applicantName: formData.name,
+          applicantEmail: formData.email,
+          applicantPhone: formData.phone,
+          coverLetter: formData.coverLetter,
+          resumeLink: formData.resume, // Используем resume как resumeLink
         },
       });
 
@@ -94,8 +89,25 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
         throw error;
       }
 
-      // Записываем в audit лог для антиспама
-      await recordApplication(jobId);
+      // Записываем в базу данных заявку  
+      const { error: dbError } = await supabase.from('applications').insert({
+        vacancy_id: jobId,
+        candidate_id: null, // Guest application
+        applied_by: 'guest',
+        guest_name: formData.name,
+        guest_email: formData.email,
+        guest_phone: formData.phone,
+        message: formData.coverLetter,
+        resume_link: formData.resume
+      });
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        // Don't throw - email was sent successfully
+      }
+
+      // Rate limit recording is now handled server-side automatically
+      // await recordApplication(jobId); - deprecated
 
       // Логируем событие
       await logEvent('application_created', {

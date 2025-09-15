@@ -61,41 +61,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Set up auth state listener
+    let mounted = true;
+
+    // Listen for auth changes - CRITICAL: Never use async functions directly
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        if (!mounted) return;
+        
+        // Only synchronous state updates here to prevent deadlock
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Defer any Supabase calls to prevent authentication deadlock
         if (session?.user) {
-          // Defer profile fetch to avoid blocking auth state change
           setTimeout(() => {
-            fetchProfile();
+            if (mounted) {
+              fetchProfile();
+            }
           }, 0);
         } else {
           setProfile(null);
+        }
+        
+        if (event === 'SIGNED_IN') {
+          console.log('User signed in');
         }
         
         setLoading(false);
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Get initial session
+    const initializeAuth = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (!mounted) return;
+      
+      if (error) {
+        console.error('Error getting session:', error);
+      }
+      
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        await fetchProfile();
+      }
+      
       setLoading(false);
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
-
-  // Update fetchProfile when user changes
-  useEffect(() => {
-    if (user) {
-      fetchProfile();
-    }
-  }, [user]);
 
   const signUp = async (email: string, password: string) => {
     const redirectUrl = `${window.location.origin}/`;

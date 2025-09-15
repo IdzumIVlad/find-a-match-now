@@ -31,7 +31,7 @@ const Index = () => {
     // Remove automatic redirect to dashboard - let guests view vacancies
   }, [user, profile, authLoading]);
 
-  // Загрузка вакансий из Supabase
+  // Загрузка вакансий из Supabase (безопасно, без скрытых данных)
   const fetchVacancies = async () => {
     try {
       const { data, error } = await supabase
