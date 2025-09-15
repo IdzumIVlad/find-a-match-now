@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useViewTracker } from '@/hooks/useViewTracker';
 import { Mail, Phone, Eye, Send, Calendar } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
+import { HelmetProvider } from 'react-helmet-async';
 import { format } from 'date-fns';
 
 interface Resume {
@@ -153,8 +155,15 @@ const ResumeDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <HelmetProvider>
+      <div className="min-h-screen bg-background">
+        <SEOHead 
+          title={`Резюме ${resume.full_name}`}
+          description={`Резюме ${resume.full_name}. ${resume.summary?.slice(0, 150)}... Навыки: ${resume.skills?.slice(0, 5).join(', ')}`}
+          type="article"
+          keywords={`резюме, кандидат, ${resume.full_name}, ${resume.skills?.join(', ')}, поиск работы`}
+        />
+        <Header />
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
@@ -315,7 +324,8 @@ const ResumeDetail = () => {
           </Card>
         )}
       </div>
-    </div>
+      </div>
+    </HelmetProvider>
   );
 };
 

@@ -9,6 +9,8 @@ import CompleteProfileModal from "@/components/CompleteProfileModal";
 import { Plus, Search, Briefcase, Users, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import SEOHead from '@/components/SEOHead';
+import { HelmetProvider } from 'react-helmet-async';
 import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
@@ -84,8 +86,14 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <HelmetProvider>
+      <div className="min-h-screen bg-background">
+        <SEOHead 
+          title="Поиск работы и вакансий"
+          description="Найдите работу мечты или идеального сотрудника на laburoGO. Простая платформа для поиска работы и талантов с быстрыми откликами."
+          keywords="работа, вакансии, поиск работы, трудоустройство, резюме, кандидаты"
+        />
+        <Header />
       
       {/* Hero Section */}
       <section className="bg-gradient-hero text-white py-20">
@@ -214,7 +222,8 @@ const Index = () => {
         open={showCompleteProfile}
         onClose={() => setShowCompleteProfile(false)}
       />
-    </div>
+      </div>
+    </HelmetProvider>
   );
 };
 

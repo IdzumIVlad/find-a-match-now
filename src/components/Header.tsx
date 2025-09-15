@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, User, Briefcase, FileText, Database } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Header = () => {
   const { user, profile, signOut } = useAuth();
@@ -49,55 +50,59 @@ const Header = () => {
             </nav>
           </div>
           
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>
-                      {getInitials(user.email || 'U')}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user.email}</p>
-                    {profile && (
-                      <p className="text-xs text-muted-foreground">
-                        {profile.role === 'employer' ? 'Работодатель' : 'Соискатель'}
-                      </p>
-                    )}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>
+                        {getInitials(user.email || 'U')}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{user.email}</p>
+                      {profile && (
+                        <p className="text-xs text-muted-foreground">
+                          {profile.role === 'employer' ? 'Работодатель' : 'Соискатель'}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <DropdownMenuItem onClick={() => navigate(getDashboardLink())}>
-                  <User className="mr-2 h-4 w-4" />
-                  Личный кабинет
-                </DropdownMenuItem>
-                {profile?.role === 'employer' && (
-                  <DropdownMenuItem onClick={() => navigate('/employer')}>
-                    <Briefcase className="mr-2 h-4 w-4" />
-                    Мои вакансии
+                  <DropdownMenuItem onClick={() => navigate(getDashboardLink())}>
+                    <User className="mr-2 h-4 w-4" />
+                    Личный кабинет
                   </DropdownMenuItem>
-                )}
-                {profile?.role === 'candidate' && (
-                  <DropdownMenuItem onClick={() => navigate('/candidate')}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Мои резюме
+                  {profile?.role === 'employer' && (
+                    <DropdownMenuItem onClick={() => navigate('/employer')}>
+                      <Briefcase className="mr-2 h-4 w-4" />
+                      Мои вакансии
+                    </DropdownMenuItem>
+                  )}
+                  {profile?.role === 'candidate' && (
+                    <DropdownMenuItem onClick={() => navigate('/candidate')}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Мои резюме
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Выйти
                   </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Выйти
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button asChild>
-              <Link to="/auth">Войти</Link>
-            </Button>
-          )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button asChild>
+                <Link to="/auth">Войти</Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </header>

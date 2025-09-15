@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/contexts/AuthContext';
+import PhoneInput from '@/components/PhoneInput';
 import { useToast } from '@/hooks/use-toast';
 
 interface CompleteProfileModalProps {
@@ -16,17 +17,23 @@ const CompleteProfileModal = ({ open, onClose }: CompleteProfileModalProps) => {
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<'employer' | 'candidate'>('candidate');
   const [loading, setLoading] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
   const { createProfile } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPhoneError('');
+    
     if (!phone.trim()) {
-      toast({
-        title: "Ошибка",
-        description: "Телефон обязателен для заполнения",
-        variant: "destructive",
-      });
+      setPhoneError('Телефон обязателен для заполнения');
+      return;
+    }
+
+    // Basic phone validation
+    const phoneRegex = /^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$/;
+    if (!phoneRegex.test(phone)) {
+      setPhoneError('Введите корректный номер телефона в формате +7 (999) 123-45-67');
       return;
     }
 
@@ -58,20 +65,17 @@ const CompleteProfileModal = ({ open, onClose }: CompleteProfileModalProps) => {
           <DialogTitle>Завершите профиль</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="phone">Телефон *</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+7 (999) 123-45-67"
-              required
-            />
-          </div>
+          <PhoneInput
+            value={phone}
+            onChange={setPhone}
+            required
+            error={phoneError}
+          />
           
           <div>
-            <Label>Роль *</Label>
+            <Label>
+              Роль <span className="text-destructive">*</span>
+            </Label>
             <RadioGroup value={role} onValueChange={(value: 'employer' | 'candidate') => setRole(value)}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="employer" id="employer" />

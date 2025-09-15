@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Header from '@/components/Header';
+import SEOHead from '@/components/SEOHead';
+import { HelmetProvider } from 'react-helmet-async';
 import ApplicationModal from '@/components/ApplicationModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -121,8 +123,15 @@ const VacancyDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <HelmetProvider>
+      <div className="min-h-screen bg-background">
+        <SEOHead 
+          title={vacancy.title}
+          description={`${vacancy.title} в ${vacancy.location || 'разных городах'}. ${vacancy.description?.slice(0, 150)}...`}
+          type="article"
+          keywords={`вакансия, работа, ${vacancy.title}, ${vacancy.location}, трудоустройство`}
+        />
+        <Header />
       
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
@@ -224,7 +233,8 @@ const VacancyDetail = () => {
         vacancyId={id || ''}
         vacancyTitle={vacancy?.title || ''}
       />
-    </div>
+      </div>
+    </HelmetProvider>
   );
 };
 

@@ -63,6 +63,25 @@ const VacancyForm = ({ open, onOpenChange, onSubmit, vacancy }: VacancyFormProps
     e.preventDefault();
     if (!user) return;
 
+    // Validation
+    if (!formData.title.trim()) {
+      toast({
+        title: "Ошибка валидации",
+        description: "Название вакансии обязательно для заполнения",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      toast({
+        title: "Ошибка валидации", 
+        description: "Описание вакансии обязательно для заполнения",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     
     try {
@@ -129,17 +148,19 @@ const VacancyForm = ({ open, onOpenChange, onSubmit, vacancy }: VacancyFormProps
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               required
+              placeholder="Например: Frontend Developer"
             />
           </div>
 
           <div>
-            <Label htmlFor="description">Описание вакансии</Label>
+            <Label htmlFor="description">Описание вакансии *</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Подробное описание вакансии, требования к кандидату..."
               rows={6}
+              required
             />
           </div>
 
