@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Header from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useViewTracker } from '@/hooks/useViewTracker';
 import { Mail, Phone, Eye, Send, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -39,10 +40,16 @@ const ResumeDetail = () => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const { toast } = useToast();
 
+  // Track views for this resume
+  useViewTracker({
+    resourceType: 'resume',
+    id: id || '',
+    enabled: !!id
+  });
+
   useEffect(() => {
     if (id) {
       fetchResume();
-      incrementViews();
     }
   }, [id]);
 
@@ -69,18 +76,6 @@ const ResumeDetail = () => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const incrementViews = async () => {
-    try {
-      const { error } = await supabase
-        .from('resumes')
-        .update({ views: (resume?.views || 0) + 1 })
-        .eq('id', id);
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error incrementing views:', error);
     }
   };
 

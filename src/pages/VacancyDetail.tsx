@@ -11,6 +11,7 @@ import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useViewTracker } from '@/hooks/useViewTracker';
 import { MapPin, DollarSign, Clock, Eye, ArrowLeft } from 'lucide-react';
 
 interface Vacancy {
@@ -45,10 +46,16 @@ const VacancyDetail = () => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
 
+  // Track views for this vacancy
+  useViewTracker({
+    resourceType: 'vacancy',
+    id: id || '',
+    enabled: !!id
+  });
+
   useEffect(() => {
     if (id) {
       fetchVacancy();
-      incrementViews();
     }
   }, [id]);
 
@@ -74,28 +81,6 @@ const VacancyDetail = () => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const incrementViews = async () => {
-    if (!id) return;
-    
-    try {
-      // First get current views count
-      const { data: currentVacancy } = await supabase
-        .from('vacancies')
-        .select('views')
-        .eq('id', id)
-        .single();
-      
-      if (currentVacancy) {
-        await supabase
-          .from('vacancies')
-          .update({ views: (currentVacancy.views || 0) + 1 })
-          .eq('id', id);
-      }
-    } catch (error) {
-      console.error('Error incrementing views:', error);
     }
   };
 
@@ -221,7 +206,7 @@ const VacancyDetail = () => {
                   <CardTitle className="text-2xl">{vacancy.title}</CardTitle>
                   <div className="flex items-center text-muted-foreground">
                     <Eye className="w-4 h-4 mr-1" />
-                    {vacancy.views}
+                    {vacancy.views} просмотров
                   </div>
                 </div>
                 <CardDescription className="flex flex-wrap gap-4 text-base">
@@ -237,7 +222,7 @@ const VacancyDetail = () => {
                   </span>
                   <span className="flex items-center">
                     <Clock className="w-4 h-4 mr-1" />
-                    {formatDate(vacancy.created_at)}
+                    Опубликовано {formatDate(vacancy.created_at)}
                   </span>
                 </CardDescription>
               </CardHeader>
