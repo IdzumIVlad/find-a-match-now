@@ -126,6 +126,33 @@ export type Database = {
           },
         ]
       }
+      data_access_log: {
+        Row: {
+          access_type: string
+          accessed_id: string | null
+          accessed_table: string
+          created_at: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          access_type: string
+          accessed_id?: string | null
+          accessed_table: string
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          access_type?: string
+          accessed_id?: string | null
+          accessed_table?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string
@@ -380,6 +407,77 @@ export type Database = {
       }
     }
     Views: {
+      applications_employer_safe: {
+        Row: {
+          applicant_name: string | null
+          applied_by: string | null
+          candidate_id: string | null
+          contact_email: string | null
+          created_at: string | null
+          id: string | null
+          message: string | null
+          resume_file_url: string | null
+          resume_id: string | null
+          resume_link: string | null
+          vacancy_id: string | null
+        }
+        Insert: {
+          applicant_name?: never
+          applied_by?: string | null
+          candidate_id?: string | null
+          contact_email?: never
+          created_at?: string | null
+          id?: string | null
+          message?: string | null
+          resume_file_url?: string | null
+          resume_id?: string | null
+          resume_link?: string | null
+          vacancy_id?: string | null
+        }
+        Update: {
+          applicant_name?: never
+          applied_by?: string | null
+          candidate_id?: string | null
+          contact_email?: never
+          created_at?: string | null
+          id?: string | null
+          message?: string | null
+          resume_file_url?: string | null
+          resume_id?: string | null
+          resume_link?: string | null
+          vacancy_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_vacancy_id_fkey"
+            columns: ["vacancy_id"]
+            isOneToOne: false
+            referencedRelation: "vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs_public: {
         Row: {
           company_name: string | null
