@@ -16,22 +16,34 @@ export type Database = {
     Tables: {
       applications: {
         Row: {
+          applied_by: string | null
           candidate_id: string
           created_at: string
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
           id: string
           message: string | null
           vacancy_id: string
         }
         Insert: {
+          applied_by?: string | null
           candidate_id: string
           created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
           id?: string
           message?: string | null
           vacancy_id: string
         }
         Update: {
+          applied_by?: string | null
           candidate_id?: string
           created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
           id?: string
           message?: string | null
           vacancy_id?: string

@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { JobCard } from "@/components/JobCard";
+import VacancyCard from "@/components/VacancyCard";
 import { JobForm } from "@/components/JobForm";
-import { ApplicationForm } from "@/components/ApplicationForm";
 import Header from "@/components/Header";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
 import { Plus, Search, Briefcase, Users, TrendingUp } from "lucide-react";
@@ -13,12 +12,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [vacancies, setVacancies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showJobForm, setShowJobForm] = useState(false);
-  const [showApplicationForm, setShowApplicationForm] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<any>(null);
   const [showCompleteProfile, setShowCompleteProfile] = useState(false);
   const { toast } = useToast();
   const { user, profile, loading: authLoading } = useAuth();
@@ -34,19 +31,21 @@ const Index = () => {
     }
   }, [user, profile, authLoading, navigate]);
 
-  // Загрузка вакансий из Supabase (без employer_email для безопасности)
-  const fetchJobs = async () => {
+  // Загрузка вакансий из Supabase
+  const fetchVacancies = async () => {
     try {
       const { data, error } = await supabase
-        .rpc('get_public_jobs');
+        .from('vacancies')
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (error) {
         throw error;
       }
 
-      setJobs(data || []);
+      setVacancies(data || []);
     } catch (error) {
-      console.error('Error fetching jobs:', error);
+      console.error('Error fetching vacancies:', error);
       toast({
         title: "Ошибка",
         description: "Не удалось загрузить вакансии",
@@ -58,25 +57,20 @@ const Index = () => {
   };
 
   useEffect(() => {
-    fetchJobs();
+    fetchVacancies();
   }, []);
 
-  const filteredJobs = jobs.filter(job =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredVacancies = vacancies.filter(vacancy =>
+    vacancy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (vacancy.location && vacancy.location.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleAddJob = () => {
-    fetchJobs(); // Перезагружаем вакансии после добавления
+    fetchVacancies(); // Перезагружаем вакансии после добавления
   };
 
-  const handleApply = (jobId: string) => {
-    const job = jobs.find(j => j.id === jobId);
-    if (job) {
-      setSelectedJob(job);
-      setShowApplicationForm(true);
-    }
+  const handleApply = (vacancyId: string) => {
+    navigate(`/vacancies/${vacancyId}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -159,7 +153,7 @@ const Index = () => {
             <h2 className="text-3xl font-bold">
               Актуальные вакансии
               <span className="text-muted-foreground text-lg ml-2">
-                ({filteredJobs.length})
+                ({filteredVacancies.length})
               </span>
             </h2>
           </div>
@@ -170,7 +164,7 @@ const Index = () => {
                 Загрузка вакансий...
               </div>
             </div>
-          ) : filteredJobs.length === 0 ? (
+          ) : filteredVacancies.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-muted-foreground text-lg mb-4">
                 {searchTerm ? "Вакансии не найдены" : "Пока нет размещенных вакансий"}
@@ -182,17 +176,18 @@ const Index = () => {
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              {filteredJobs.map((job) => (
-                <JobCard
-                  key={job.id}
-                  id={job.id}
-                  title={job.title}
-                  company={job.company_name}
-                  location={job.location || "Не указано"}
-                  salary={job.salary || "По договоренности"}
-                  type={job.employment_type || "Не указано"}
-                  description={job.description || ""}
-                  postedDate={formatDate(job.created_at)}
+              {filteredVacancies.map((vacancy) => (
+                <VacancyCard
+                  key={vacancy.id}
+                  id={vacancy.id}
+                  title={vacancy.title}
+                  location={vacancy.location}
+                  salary_min={vacancy.salary_min}
+                  salary_max={vacancy.salary_max}
+                  employment_type={vacancy.employment_type}
+                  description={vacancy.description}
+                  views={vacancy.views}
+                  postedDate={formatDate(vacancy.created_at)}
                   onApply={handleApply}
                 />
               ))}
@@ -216,16 +211,6 @@ const Index = () => {
         onOpenChange={setShowJobForm}
         onSubmit={handleAddJob}
       />
-
-      {selectedJob && (
-        <ApplicationForm
-          open={showApplicationForm}
-          onOpenChange={setShowApplicationForm}
-          jobId={selectedJob.id}
-          jobTitle={selectedJob.title}
-          companyName={selectedJob.company_name}
-        />
-      )}
 
       <CompleteProfileModal
         open={showCompleteProfile}

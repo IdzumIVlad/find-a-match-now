@@ -9,10 +9,10 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Briefcase, FileText } from 'lucide-react';
 
 const Header = () => {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -22,6 +22,11 @@ const Header = () => {
 
   const getInitials = (email: string) => {
     return email.charAt(0).toUpperCase();
+  };
+
+  const getDashboardLink = () => {
+    if (!profile) return '/dashboard';
+    return profile.role === 'employer' ? '/employer' : '/candidate';
   };
 
   return (
@@ -47,12 +52,29 @@ const Header = () => {
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
                     <p className="font-medium">{user.email}</p>
+                    {profile && (
+                      <p className="text-xs text-muted-foreground">
+                        {profile.role === 'employer' ? 'Работодатель' : 'Соискатель'}
+                      </p>
+                    )}
                   </div>
                 </div>
-                <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                <DropdownMenuItem onClick={() => navigate(getDashboardLink())}>
                   <User className="mr-2 h-4 w-4" />
                   Личный кабинет
                 </DropdownMenuItem>
+                {profile?.role === 'employer' && (
+                  <DropdownMenuItem onClick={() => navigate('/employer')}>
+                    <Briefcase className="mr-2 h-4 w-4" />
+                    Мои вакансии
+                  </DropdownMenuItem>
+                )}
+                {profile?.role === 'candidate' && (
+                  <DropdownMenuItem onClick={() => navigate('/candidate')}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Мои резюме
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Выйти
