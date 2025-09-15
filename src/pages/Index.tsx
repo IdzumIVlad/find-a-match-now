@@ -21,7 +21,7 @@ const Index = () => {
   const [showJobForm, setShowJobForm] = useState(false);
   const [showCompleteProfile, setShowCompleteProfile] = useState(false);
   const { toast } = useToast();
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, fetchProfile } = useAuth();
   const navigate = useNavigate();
 
   // Check if user needs to complete profile
@@ -33,6 +33,18 @@ const Index = () => {
       setShowCompleteProfile(false);
     }
   }, [user, profile, authLoading]);
+
+  // Принудительно обновляем профиль при изменении пользователя
+  useEffect(() => {
+    if (user && !authLoading && !profile) {
+      // Небольшая задержка и попытка перезагрузить профиль
+      const timer = setTimeout(() => {
+        fetchProfile();
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, authLoading, profile, fetchProfile]);
 
   // Загрузка вакансий из Supabase (безопасно, без скрытых данных)
   const fetchVacancies = async () => {

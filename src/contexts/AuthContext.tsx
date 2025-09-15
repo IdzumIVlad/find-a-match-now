@@ -53,10 +53,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
     
     if (!error && data) {
       setProfile(data);
+    } else if (error) {
+      console.error('Error fetching profile:', error);
     }
   };
 
@@ -172,6 +174,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const createProfile = async (phone: string, role: 'employer' | 'candidate') => {
     if (!user) return { error: 'No user found' };
 
+    // Сначала проверим, не существует ли уже профиль
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (existingProfile) {
+      // Профиль уже существует, просто обновим состояние
+      setProfile(existingProfile);
+      return { error: null };
+    }
+
+    // Создаем новый профиль только если его нет
     const { error } = await supabase
       .from('profiles')
       .insert({

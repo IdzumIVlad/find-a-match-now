@@ -53,8 +53,8 @@ const CompleteProfileModal = ({ open, onClose }: CompleteProfileModalProps) => {
         title: "Профиль создан",
         description: "Ваш профиль успешно создан",
       });
-      // Не закрываем модальное окно сразу - позволяем useEffect в Index.tsx обработать обновление профиля
       setLoading(false);
+      onClose(); // Теперь можно безопасно закрыть модальное окно
     }
   };
 
