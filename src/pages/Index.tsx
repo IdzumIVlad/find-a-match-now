@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { JobCard } from "@/components/JobCard";
 import { JobForm } from "@/components/JobForm";
 import { ApplicationForm } from "@/components/ApplicationForm";
+import Header from "@/components/Header";
+import CompleteProfileModal from "@/components/CompleteProfileModal";
 import { Plus, Search, Briefcase, Users, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -15,7 +19,20 @@ const Index = () => {
   const [showJobForm, setShowJobForm] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [showCompleteProfile, setShowCompleteProfile] = useState(false);
   const { toast } = useToast();
+  const { user, profile, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+
+  // Check if user needs to complete profile
+  useEffect(() => {
+    if (!authLoading && user && !profile) {
+      setShowCompleteProfile(true);
+    } else if (!authLoading && user && profile) {
+      // If profile is complete, redirect to dashboard
+      navigate('/dashboard');
+    }
+  }, [user, profile, authLoading, navigate]);
 
   // Загрузка вакансий из Supabase (без employer_email для безопасности)
   const fetchJobs = async () => {
@@ -76,6 +93,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
+      
       {/* Hero Section */}
       <section className="bg-gradient-hero text-white py-20">
         <div className="container mx-auto px-4 text-center">
@@ -207,6 +226,11 @@ const Index = () => {
           companyName={selectedJob.company_name}
         />
       )}
+
+      <CompleteProfileModal
+        open={showCompleteProfile}
+        onClose={() => setShowCompleteProfile(false)}
+      />
     </div>
   );
 };
