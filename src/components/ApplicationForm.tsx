@@ -11,12 +11,12 @@ import { supabase } from "@/integrations/supabase/client";
 interface ApplicationFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  jobId: string;
   jobTitle: string;
   companyName: string;
-  employerEmail: string;
 }
 
-export const ApplicationForm = ({ open, onOpenChange, jobTitle, companyName, employerEmail }: ApplicationFormProps) => {
+export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyName }: ApplicationFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,6 +41,18 @@ export const ApplicationForm = ({ open, onOpenChange, jobTitle, companyName, emp
     setIsSubmitting(true);
 
     try {
+      // Получаем email работодателя через безопасную функцию
+      const { data: employerEmail, error: emailError } = await supabase
+        .rpc('get_job_employer_email', { job_id: jobId });
+
+      if (emailError) {
+        throw emailError;
+      }
+
+      if (!employerEmail) {
+        throw new Error('Не удалось получить email работодателя');
+      }
+
       const { data, error } = await supabase.functions.invoke('send-application', {
         body: {
           ...formData,

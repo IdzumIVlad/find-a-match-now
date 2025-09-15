@@ -17,13 +17,11 @@ const Index = () => {
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const { toast } = useToast();
 
-  // Загрузка вакансий из Supabase
+  // Загрузка вакансий из Supabase (без employer_email для безопасности)
   const fetchJobs = async () => {
     try {
       const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .rpc('get_public_jobs');
 
       if (error) {
         throw error;
@@ -204,9 +202,9 @@ const Index = () => {
         <ApplicationForm
           open={showApplicationForm}
           onOpenChange={setShowApplicationForm}
+          jobId={selectedJob.id}
           jobTitle={selectedJob.title}
           companyName={selectedJob.company_name}
-          employerEmail={selectedJob.employer_email}
         />
       )}
     </div>

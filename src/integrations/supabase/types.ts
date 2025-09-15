@@ -61,7 +61,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_job_employer_email: {
+        Args: { job_id: string }
+        Returns: string
+      }
+      get_public_jobs: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          company_name: string
+          created_at: string
+          description: string
+          employment_type: string
+          id: string
+          location: string
+          requirements: string
+          salary: string
+          title: string
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
