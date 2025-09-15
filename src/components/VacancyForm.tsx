@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useEventLogger } from '@/hooks/useEventLogger';
 
 interface VacancyFormProps {
   open: boolean;
@@ -36,6 +37,7 @@ const VacancyForm = ({ open, onOpenChange, onSubmit, vacancy }: VacancyFormProps
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { logEvent } = useEventLogger();
 
   useEffect(() => {
     if (vacancy) {
@@ -107,8 +109,33 @@ const VacancyForm = ({ open, onOpenChange, onSubmit, vacancy }: VacancyFormProps
         // Create new vacancy
         const result = await supabase
           .from('vacancies')
-          .insert(vacancyData);
+          .insert(vacancyData)
+          .select()
+          .single();
         error = result.error;
+        
+        if (!error && result.data) {
+          // Логируем событие создания вакансии
+          await logEvent('vacancy_created', {
+            vacancy_id: result.data.id,
+            title: formData.title,
+            location: formData.location,
+            employment_type: formData.employment_type
+          });
+
+          // Создаем запись в outbox для вебхука
+          await supabase
+            .from('outbox_webhooks')
+            .insert({
+              event_type: 'vacancy_created',
+              payload: {
+                vacancy_id: result.data.id,
+                title: formData.title,
+                employer_id: user.id,
+                created_at: new Date().toISOString()
+              }
+            });
+        }
       }
 
       if (error) throw error;

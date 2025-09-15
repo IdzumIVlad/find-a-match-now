@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useEventLogger } from "@/hooks/useEventLogger";
+import { useRateLimit } from "@/hooks/useRateLimit";
 
 interface ApplicationFormProps {
   open: boolean;
@@ -18,7 +20,11 @@ interface ApplicationFormProps {
 
 export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyName }: ApplicationFormProps) => {
   const { toast } = useToast();
+  const { logEvent } = useEventLogger();
+  const { checkRateLimit, recordApplication, isBlocked } = useRateLimit();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [honeypot, setHoneypot] = useState(''); // Антиспам honeypot
+  const [buttonDisabled, setButtonDisabled] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -29,6 +35,13 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Проверка honeypot
+    if (honeypot) {
+      console.log('Spam detected via honeypot');
+      return;
+    }
+    
     if (!formData.name || !formData.email) {
       toast({
         title: "Ошибка",
@@ -38,7 +51,22 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
       return;
     }
 
+    // Проверка rate limiting
+    const rateLimited = await checkRateLimit(jobId);
+    if (rateLimited) {
+      toast({
+        title: "Слишком много заявок",
+        description: "Повторная заявка будет доступна через 10 минут",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
+    
+    // Блокируем кнопку на 10 секунд
+    setButtonDisabled(true);
+    setTimeout(() => setButtonDisabled(false), 10000);
 
     try {
       // Получаем email работодателя через безопасную функцию
@@ -65,6 +93,32 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
       if (error) {
         throw error;
       }
+
+      // Записываем в audit лог для антиспама
+      await recordApplication(jobId);
+
+      // Логируем событие
+      await logEvent('application_created', {
+        job_id: jobId,
+        job_title: jobTitle,
+        company_name: companyName,
+        applicant_email: formData.email
+      });
+
+      // Создаем запись в outbox для вебхука
+      await supabase
+        .from('outbox_webhooks')
+        .insert({
+          event_type: 'application_created',
+          payload: {
+            job_id: jobId,
+            job_title: jobTitle,
+            company_name: companyName,
+            applicant_name: formData.name,
+            applicant_email: formData.email,
+            created_at: new Date().toISOString()
+          }
+        });
 
       setFormData({
         name: "",
@@ -167,9 +221,27 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
             />
           </div>
 
+          {/* Honeypot field - скрытое поле для ботов */}
+          <input
+            type="text"
+            name="website"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            style={{ display: 'none' }}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+
           <div className="flex gap-2 pt-4">
-            <Button type="submit" className="flex-1" disabled={isSubmitting}>
-              {isSubmitting ? "Отправляется..." : "Отправить отклик"}
+            <Button 
+              type="submit" 
+              className="flex-1" 
+              disabled={isSubmitting || buttonDisabled || isBlocked}
+            >
+              {isSubmitting ? "Отправляется..." : 
+               buttonDisabled ? "Подождите..." :
+               isBlocked ? "Заблокировано" : 
+               "Отправить отклик"}
             </Button>
             <Button 
               type="button" 

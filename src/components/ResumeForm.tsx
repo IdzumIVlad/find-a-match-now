@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, X, Trash2 } from 'lucide-react';
 import { DatePickerDemo } from '@/components/DatePicker';
+import { useEventLogger } from '@/hooks/useEventLogger';
 
 interface ResumeFormProps {
   open: boolean;
@@ -49,6 +50,7 @@ const ResumeForm = ({ open, onOpenChange, onSubmit, resume }: ResumeFormProps) =
   const [loading, setLoading] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const { logEvent } = useEventLogger();
 
   useEffect(() => {
     if (resume) {
@@ -132,11 +134,22 @@ const ResumeForm = ({ open, onOpenChange, onSubmit, resume }: ResumeFormProps) =
           description: "Резюме обновлено",
         });
       } else {
-        const { error } = await supabase
+        const { error, data } = await supabase
           .from('resumes')
-          .insert([resumeData]);
+          .insert([resumeData])
+          .select()
+          .single();
         
         if (error) throw error;
+        
+        // Логируем событие создания резюме
+        await logEvent('resume_created', {
+          resume_id: data.id,
+          full_name: formData.full_name,
+          skills_count: formData.skills.length,
+          has_experience: formData.experience.length > 0,
+          has_education: formData.education.length > 0
+        });
         
         toast({
           title: "Успешно",

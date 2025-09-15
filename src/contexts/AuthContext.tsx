@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useEventLogger } from '@/hooks/useEventLogger';
 
 interface Profile {
   id: string;
@@ -31,6 +32,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Создаем временный экземпляр логгера для использования внутри контекста
+  const tempLogEvent = async (eventType: string, payload?: any) => {
+    try {
+      await supabase.from('events').insert({
+        user_id: user?.id || null,
+        event_type: eventType,
+        payload: payload || null
+      });
+    } catch (error) {
+      console.error('Failed to log event:', error);
+    }
+  };
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -93,6 +107,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         emailRedirectTo: redirectUrl
       }
     });
+    
+    if (!error) {
+      await tempLogEvent('auth_signup', { email });
+    }
+    
     return { error };
   };
 
@@ -101,6 +120,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password
     });
+    
+    if (!error) {
+      await tempLogEvent('auth_login', { email });
+    }
+    
     return { error };
   };
 
@@ -111,6 +135,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         redirectTo: `${window.location.origin}/`
       }
     });
+    
+    if (!error) {
+      await tempLogEvent('auth_login', { provider: 'google' });
+    }
+    
     return { error };
   };
 

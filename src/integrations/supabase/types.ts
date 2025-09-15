@@ -81,6 +81,65 @@ export type Database = {
           },
         ]
       }
+      apply_audit: {
+        Row: {
+          created_at: string
+          id: string
+          ip_hash: string | null
+          user_agent: string | null
+          user_id: string | null
+          vacancy_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          vacancy_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          vacancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apply_audit_vacancy_id_fkey"
+            columns: ["vacancy_id"]
+            isOneToOne: false
+            referencedRelation: "vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
           company_name: string
@@ -119,6 +178,39 @@ export type Database = {
           requirements?: string | null
           salary?: string | null
           title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      outbox_webhooks: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          last_error: string | null
+          payload: Json
+          status: string
+          try_count: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          last_error?: string | null
+          payload: Json
+          status?: string
+          try_count?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          last_error?: string | null
+          payload?: Json
+          status?: string
+          try_count?: number
           updated_at?: string
         }
         Relationships: []
@@ -186,6 +278,7 @@ export type Database = {
           full_name: string
           id: string
           phone: string
+          raw_text: string | null
           skills: string[] | null
           summary: string | null
           views: number
@@ -199,6 +292,7 @@ export type Database = {
           full_name: string
           id?: string
           phone: string
+          raw_text?: string | null
           skills?: string[] | null
           summary?: string | null
           views?: number
@@ -212,6 +306,7 @@ export type Database = {
           full_name?: string
           id?: string
           phone?: string
+          raw_text?: string | null
           skills?: string[] | null
           summary?: string | null
           views?: number
