@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import SEOHead from '@/components/SEOHead';
 import { HelmetProvider } from 'react-helmet-async';
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const [vacancies, setVacancies] = useState<any[]>([]);
@@ -23,6 +24,7 @@ const Index = () => {
   const { toast } = useToast();
   const { user, profile, loading: authLoading, fetchProfile } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Check if user needs to complete profile
   useEffect(() => {
@@ -51,7 +53,7 @@ const Index = () => {
     } catch (error) {
       console.error('Error fetching vacancies:', error);
       toast({
-        title: "Ошибка",
+        title: t('common.error'),
         description: "Не удалось загрузить вакансии",
         variant: "destructive",
       });
@@ -83,9 +85,9 @@ const Index = () => {
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 1) return "сегодня";
-    if (diffDays === 2) return "вчера";
-    if (diffDays <= 7) return `${diffDays - 1} дня назад`;
+    if (diffDays === 1) return t('common.today');
+    if (diffDays === 2) return t('common.yesterday');
+    if (diffDays <= 7) return t('common.daysAgo', { count: diffDays - 1 });
     return date.toLocaleDateString("ru-RU");
   };
 
@@ -93,7 +95,7 @@ const Index = () => {
     <HelmetProvider>
       <div className="min-h-screen bg-background">
         <SEOHead 
-          title="Поиск работы и вакансий"
+          title={t('home.title')}
           description="Найдите работу мечты или идеального сотрудника на laburoGO. Простая платформа для поиска работы и талантов с быстрыми откликами."
           keywords="работа, вакансии, поиск работы, трудоустройство, резюме, кандидаты"
         />
@@ -103,17 +105,17 @@ const Index = () => {
       <section className="bg-gradient-hero text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-6">
-            Найдите работу мечты или идеального сотрудника
+            {t('home.title')}
           </h1>
           <p className="text-xl mb-8 opacity-90">
-            Простая платформа для поиска работы и талантов
+            {t('home.subtitle')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Поиск вакансий..."
+                placeholder={t('home.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-white text-foreground"
@@ -124,7 +126,7 @@ const Index = () => {
               className="bg-accent hover:bg-accent/90 text-accent-foreground"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Разместить вакансию
+              {t('home.postJob')}
             </Button>
           </div>
 
@@ -133,24 +135,24 @@ const Index = () => {
               <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Briefcase className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Простое размещение</h3>
-              <p className="opacity-90">Разместите вакансию за несколько минут</p>
+              <h3 className="text-xl font-semibold mb-2">{t('home.simplePosting')}</h3>
+              <p className="opacity-90">{t('home.simplePostingDesc')}</p>
             </div>
             
             <div className="text-center">
               <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Быстрые отклики</h3>
-              <p className="opacity-90">Получайте отклики прямо на почту</p>
+              <h3 className="text-xl font-semibold mb-2">{t('home.fastResponses')}</h3>
+              <p className="opacity-90">{t('home.fastResponsesDesc')}</p>
             </div>
             
             <div className="text-center">
               <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Эффективно</h3>
-              <p className="opacity-90">Никаких лишних сложностей</p>
+              <h3 className="text-xl font-semibold mb-2">{t('home.efficient')}</h3>
+              <p className="opacity-90">{t('home.efficientDesc')}</p>
             </div>
           </div>
         </div>
@@ -161,7 +163,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold">
-              Актуальные вакансии
+              {t('home.activeJobs')}
               <span className="text-muted-foreground text-lg ml-2">
                 ({filteredVacancies.length})
               </span>
@@ -171,17 +173,17 @@ const Index = () => {
           {loading ? (
             <div className="text-center py-12">
               <div className="text-muted-foreground text-lg">
-                Загрузка вакансий...
+                {t('home.loadingJobs')}
               </div>
             </div>
           ) : filteredVacancies.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-muted-foreground text-lg mb-4">
-                {searchTerm ? "Вакансии не найдены" : "Пока нет размещенных вакансий"}
+                {searchTerm ? t('home.noJobsFound') : t('home.noJobs')}
               </div>
               <Button onClick={() => setShowVacancyForm(true)} variant="outline">
                 <Plus className="w-4 h-4 mr-2" />
-                Разместить первую вакансию
+                {t('home.postFirstJob')}
               </Button>
             </div>
           ) : (

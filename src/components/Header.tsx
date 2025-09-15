@@ -11,10 +11,13 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, User, Briefcase, FileText, Database } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSignOut = async () => {
     await signOut();
@@ -45,12 +48,13 @@ const Header = () => {
                 className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
               >
                 <Database className="w-4 h-4" />
-                База резюме
+                {t('common.resumes')}
               </Link>
             </nav>
           </div>
           
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <ThemeToggle />
             
             {user ? (
@@ -70,36 +74,36 @@ const Header = () => {
                       <p className="font-medium">{user.email}</p>
                       {profile && (
                         <p className="text-xs text-muted-foreground">
-                          {profile.role === 'employer' ? 'Работодатель' : 'Соискатель'}
+                          {profile.role === 'employer' ? t('common.employer') : t('common.candidate')}
                         </p>
                       )}
                     </div>
                   </div>
                   <DropdownMenuItem onClick={() => navigate(getDashboardLink())}>
                     <User className="mr-2 h-4 w-4" />
-                    Личный кабинет
+                    {t('common.dashboard')}
                   </DropdownMenuItem>
                   {profile?.role === 'employer' && (
                     <DropdownMenuItem onClick={() => navigate('/employer')}>
                       <Briefcase className="mr-2 h-4 w-4" />
-                      Мои вакансии
+                      {t('common.myVacancies')}
                     </DropdownMenuItem>
                   )}
                   {profile?.role === 'candidate' && (
                     <DropdownMenuItem onClick={() => navigate('/candidate')}>
                       <FileText className="mr-2 h-4 w-4" />
-                      Мои резюме
+                      {t('common.myResumes')}
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Выйти
+                    {t('common.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Button asChild>
-                <Link to="/auth">Войти</Link>
+                <Link to="/auth">{t('common.login')}</Link>
               </Button>
             )}
           </div>
