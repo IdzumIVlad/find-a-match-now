@@ -59,8 +59,8 @@ const CompleteProfileModal = ({ open, onClose }: CompleteProfileModalProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-[425px]" onInteractOutside={(e) => e.preventDefault()}>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Завершите профиль</DialogTitle>
         </DialogHeader>
