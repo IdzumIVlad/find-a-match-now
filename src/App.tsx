@@ -15,6 +15,8 @@ import ResumeDetail from "./pages/ResumeDetail";
 import Employer from "./pages/Employer";
 import Candidate from "./pages/Candidate";
 import Resumes from "./pages/Resumes";
+import TermsOfUse from "./pages/TermsOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ const App = () => (
             <Route path="/vacancies/:id" element={<VacancyDetail />} />
             <Route path="/resumes" element={<Resumes />} />
             <Route path="/resumes/:id" element={<ResumeDetail />} />
+            <Route path="/terms" element={<TermsOfUse />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route 
               path="/dashboard" 
               element={
