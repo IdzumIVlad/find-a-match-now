@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import VacancyCard from "@/components/VacancyCard";
 import { JobForm } from "@/components/JobForm";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
 import { Plus, Search, Briefcase, Users, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -202,14 +203,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-muted py-8 mt-16">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-muted-foreground">
-            © 2024 laburoGO. Простая платформа для поиска работы.
-          </p>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Modals */}
       <JobForm

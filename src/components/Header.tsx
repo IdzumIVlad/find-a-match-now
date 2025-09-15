@@ -36,7 +36,7 @@ const Header = () => {
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center gap-8">
             <Link to="/" className="text-xl font-bold text-primary">
-              Job Board
+              LaburoGO
             </Link>
             
             <nav className="flex items-center gap-6">
