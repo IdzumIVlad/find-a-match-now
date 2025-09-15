@@ -71,7 +71,28 @@ const resources = {
       // Footer
       "footer.copyright": "© 2024 LaburoGO. Simple platform for job search.",
       "footer.terms": "Terms of Use",
-      "footer.privacy": "Privacy Policy"
+      "footer.privacy": "Privacy Policy",
+
+      // Vacancy
+      "vacancy.salaryNegotiable": "Negotiable",
+      "vacancy.salaryFrom": "from",
+      "vacancy.salaryTo": "up to",
+      "vacancy.noDescription": "No description provided",
+      "vacancy.apply": "Apply",
+      "vacancy.views": "views",
+      "vacancy.published": "Published",
+      "vacancy.jobDescription": "Job Description",
+      "vacancy.employerContacts": "Employer Contacts",
+      "vacancy.email": "Email:",
+      "vacancy.phone": "Phone:",
+      "vacancy.sendApplication": "Send Application",
+      "vacancy.orLogin": "Or",
+      "vacancy.loginText": "sign in",
+      "vacancy.forQuickApply": "for quick application",
+      "vacancy.notFound": "Vacancy not found",
+      "vacancy.backToList": "Back to list",
+      "vacancy.backToVacancies": "Back to vacancies",
+      "vacancy.loadingError": "Failed to load vacancy"
     }
   },
   es: {
@@ -141,7 +162,28 @@ const resources = {
       // Footer
       "footer.copyright": "© 2024 LaburoGO. Plataforma simple para búsqueda de trabajo.",
       "footer.terms": "Términos de Uso",
-      "footer.privacy": "Política de Privacidad"
+      "footer.privacy": "Política de Privacidad",
+
+      // Vacancy
+      "vacancy.salaryNegotiable": "Negociable",
+      "vacancy.salaryFrom": "desde",
+      "vacancy.salaryTo": "hasta", 
+      "vacancy.noDescription": "Sin descripción",
+      "vacancy.apply": "Aplicar",
+      "vacancy.views": "visualizaciones",
+      "vacancy.published": "Publicado",
+      "vacancy.jobDescription": "Descripción del Trabajo",
+      "vacancy.employerContacts": "Contactos del Empleador",
+      "vacancy.email": "Email:",
+      "vacancy.phone": "Teléfono:",
+      "vacancy.sendApplication": "Enviar Aplicación",
+      "vacancy.orLogin": "O",
+      "vacancy.loginText": "iniciar sesión",
+      "vacancy.forQuickApply": "para aplicación rápida",
+      "vacancy.notFound": "Vacante no encontrada",
+      "vacancy.backToList": "Volver a la lista",
+      "vacancy.backToVacancies": "Volver a vacantes",
+      "vacancy.loadingError": "Error al cargar vacante"
     }
   },
   pt: {
@@ -211,7 +253,28 @@ const resources = {
       // Footer
       "footer.copyright": "© 2024 LaburoGO. Plataforma simples para busca de emprego.",
       "footer.terms": "Termos de Uso",
-      "footer.privacy": "Política de Privacidade"
+      "footer.privacy": "Política de Privacidade",
+
+      // Vacancy
+      "vacancy.salaryNegotiable": "Negociável",
+      "vacancy.salaryFrom": "a partir de",
+      "vacancy.salaryTo": "até",
+      "vacancy.noDescription": "Sem descrição",
+      "vacancy.apply": "Candidatar",
+      "vacancy.views": "visualizações",
+      "vacancy.published": "Publicado",
+      "vacancy.jobDescription": "Descrição da Vaga",
+      "vacancy.employerContacts": "Contatos do Empregador",
+      "vacancy.email": "Email:",
+      "vacancy.phone": "Telefone:",
+      "vacancy.sendApplication": "Enviar Candidatura",
+      "vacancy.orLogin": "Ou",
+      "vacancy.loginText": "entrar",
+      "vacancy.forQuickApply": "para candidatura rápida",
+      "vacancy.notFound": "Vaga não encontrada",
+      "vacancy.backToList": "Voltar à lista",
+      "vacancy.backToVacancies": "Voltar às vagas",
+      "vacancy.loadingError": "Erro ao carregar vaga"
     }
   },
   ru: {
@@ -281,7 +344,28 @@ const resources = {
       // Footer
       "footer.copyright": "© 2024 LaburoGO. Простая платформа для поиска работы.",
       "footer.terms": "Условия использования",
-      "footer.privacy": "Политика конфиденциальности"
+      "footer.privacy": "Политика конфиденциальности",
+
+      // Vacancy
+      "vacancy.salaryNegotiable": "По договоренности",
+      "vacancy.salaryFrom": "от",
+      "vacancy.salaryTo": "до",
+      "vacancy.noDescription": "Описание не указано",
+      "vacancy.apply": "Откликнуться",
+      "vacancy.views": "просмотров",
+      "vacancy.published": "Опубликовано",
+      "vacancy.jobDescription": "Описание вакансии",
+      "vacancy.employerContacts": "Контакты работодателя",
+      "vacancy.email": "Email:",
+      "vacancy.phone": "Телефон:",
+      "vacancy.sendApplication": "Отправить отклик",
+      "vacancy.orLogin": "Или",
+      "vacancy.loginText": "войдите",
+      "vacancy.forQuickApply": "для быстрого отклика",
+      "vacancy.notFound": "Вакансия не найдена",
+      "vacancy.backToList": "Вернуться к списку",
+      "vacancy.backToVacancies": "Назад к вакансиям",
+      "vacancy.loadingError": "Не удалось загрузить вакансию"
     }
   }
 };

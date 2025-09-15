@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, DollarSign, Clock, Eye } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface VacancyCardProps {
   id: string;
@@ -30,12 +31,14 @@ const VacancyCard = ({
   postedDate,
   onApply
 }: VacancyCardProps) => {
+  const { t } = useTranslation();
+  
   const formatSalary = (min?: number, max?: number) => {
-    if (!min && !max) return 'По договоренности';
+    if (!min && !max) return t('vacancy.salaryNegotiable');
     if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()} ₽`;
-    if (min) return `от ${min.toLocaleString()} ₽`;
-    if (max) return `до ${max.toLocaleString()} ₽`;
-    return 'По договоренности';
+    if (min) return `${t('vacancy.salaryFrom')} ${min.toLocaleString()} ₽`;
+    if (max) return `${t('vacancy.salaryTo')} ${max.toLocaleString()} ₽`;
+    return t('vacancy.salaryNegotiable');
   };
 
   return (
@@ -73,7 +76,7 @@ const VacancyCard = ({
       <CardContent className="flex-1 flex flex-col">
         <div className="flex-1">
           <p className="text-muted-foreground line-clamp-3 mb-4">
-            {description || 'Описание не указано'}
+            {description || t('vacancy.noDescription')}
           </p>
         </div>
         <div className="flex justify-between items-center pt-4 border-t">
@@ -82,7 +85,7 @@ const VacancyCard = ({
             {postedDate}
           </div>
           <Button size="sm" onClick={() => onApply(id)}>
-            Откликнуться
+            {t('vacancy.apply')}
           </Button>
         </div>
       </CardContent>

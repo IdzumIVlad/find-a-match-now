@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useViewTracker } from '@/hooks/useViewTracker';
 import { MapPin, DollarSign, Clock, Eye, ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Vacancy {
   id: string;
@@ -41,6 +42,7 @@ const VacancyDetail = () => {
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Track views for this vacancy
   useViewTracker({
@@ -71,8 +73,8 @@ const VacancyDetail = () => {
     } catch (error) {
       console.error('Error fetching vacancy:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить вакансию",
+        title: t('common.error'),
+        description: t('vacancy.loadingError'),
         variant: "destructive",
       });
     } finally {
@@ -81,11 +83,11 @@ const VacancyDetail = () => {
   };
 
   const formatSalary = (min?: number, max?: number) => {
-    if (!min && !max) return 'По договоренности';
+    if (!min && !max) return t('vacancy.salaryNegotiable');
     if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()} ₽`;
-    if (min) return `от ${min.toLocaleString()} ₽`;
-    if (max) return `до ${max.toLocaleString()} ₽`;
-    return 'По договоренности';
+    if (min) return `${t('vacancy.salaryFrom')} ${min.toLocaleString()} ₽`;
+    if (max) return `${t('vacancy.salaryTo')} ${max.toLocaleString()} ₽`;
+    return t('vacancy.salaryNegotiable');
   };
 
   const formatDate = (dateString: string) => {
@@ -97,7 +99,7 @@ const VacancyDetail = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">Загрузка...</div>
+          <div className="text-center">{t('common.loading')}</div>
         </div>
       </div>
     );
@@ -109,11 +111,11 @@ const VacancyDetail = () => {
         <Header />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Вакансия не найдена</h1>
+            <h1 className="text-2xl font-bold mb-4">{t('vacancy.notFound')}</h1>
             <Link to="/">
               <Button variant="outline">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Вернуться к списку
+                {t('vacancy.backToList')}
               </Button>
             </Link>
           </div>
@@ -138,7 +140,7 @@ const VacancyDetail = () => {
           <Link to="/">
             <Button variant="outline">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Назад к вакансиям
+              {t('vacancy.backToVacancies')}
             </Button>
           </Link>
         </div>
@@ -151,7 +153,7 @@ const VacancyDetail = () => {
                   <CardTitle className="text-2xl">{vacancy.title}</CardTitle>
                   <div className="flex items-center text-muted-foreground">
                     <Eye className="w-4 h-4 mr-1" />
-                    {vacancy.views} просмотров
+                    {vacancy.views} {t('vacancy.views')}
                   </div>
                 </div>
                 <CardDescription className="flex flex-wrap gap-4 text-base">
@@ -167,7 +169,7 @@ const VacancyDetail = () => {
                   </span>
                   <span className="flex items-center">
                     <Clock className="w-4 h-4 mr-1" />
-                    Опубликовано {formatDate(vacancy.created_at)}
+                    {t('vacancy.published')} {formatDate(vacancy.created_at)}
                   </span>
                 </CardDescription>
               </CardHeader>
@@ -178,9 +180,9 @@ const VacancyDetail = () => {
                   </div>
                 )}
                 <div>
-                  <h3 className="font-semibold mb-2">Описание вакансии</h3>
+                  <h3 className="font-semibold mb-2">{t('vacancy.jobDescription')}</h3>
                   <div className="whitespace-pre-wrap text-muted-foreground">
-                    {vacancy.description || 'Описание не указано'}
+                    {vacancy.description || t('vacancy.noDescription')}
                   </div>
                 </div>
               </CardContent>
@@ -190,15 +192,15 @@ const VacancyDetail = () => {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Контакты работодателя</CardTitle>
+                <CardTitle>{t('vacancy.employerContacts')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div>
-                  <Label className="text-sm font-medium">Email:</Label>
+                  <Label className="text-sm font-medium">{t('vacancy.email')}</Label>
                   <p className="text-muted-foreground">{vacancy.profiles?.email}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Телефон:</Label>
+                  <Label className="text-sm font-medium">{t('vacancy.phone')}</Label>
                   <p className="text-muted-foreground">{vacancy.profiles?.phone}</p>
                 </div>
               </CardContent>
@@ -206,18 +208,18 @@ const VacancyDetail = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Откликнуться</CardTitle>
+                <CardTitle>{t('vacancy.apply')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Button 
                   className="w-full" 
                   onClick={() => setShowApplicationModal(true)}
                 >
-                  Отправить отклик
+                  {t('vacancy.sendApplication')}
                 </Button>
                 {!user && (
                   <p className="text-sm text-muted-foreground mt-2 text-center">
-                    Или <Link to="/auth" className="text-primary hover:underline">войдите</Link> для быстрого отклика
+                    {t('vacancy.orLogin')} <Link to="/auth" className="text-primary hover:underline">{t('vacancy.loginText')}</Link> {t('vacancy.forQuickApply')}
                   </p>
                 )}
               </CardContent>
