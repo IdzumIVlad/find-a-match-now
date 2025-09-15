@@ -14,11 +14,13 @@ import { Link } from 'react-router-dom';
 
 interface Resume {
   id: string;
-  full_name: string;
+  // Note: full_name removed for privacy - not available in public view
   summary: string;
   skills: string[];
   views: number;
   created_at: string;
+  education?: any;
+  experience?: any;
 }
 
 const Resumes = () => {
@@ -104,7 +106,7 @@ const Resumes = () => {
 
     if (searchTerm) {
       filtered = filtered.filter(resume =>
-        resume.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        // Note: full_name is excluded from public view for privacy protection
         resume.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         resume.skills?.some(skill => 
           skill.toLowerCase().includes(searchTerm.toLowerCase())
@@ -200,7 +202,7 @@ const Resumes = () => {
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Поиск по имени, описанию или навыкам..."
+                      placeholder="Поиск по описанию или навыкам..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10"
@@ -253,7 +255,7 @@ const Resumes = () => {
                       <div className="flex-1">
                         <Link to={`/resumes/${resume.id}`}>
                           <CardTitle className="text-lg hover:text-primary transition-colors cursor-pointer">
-                            {resume.full_name}
+                            Резюме кандидата
                           </CardTitle>
                         </Link>
                         <div className="mt-2 text-sm text-muted-foreground">
