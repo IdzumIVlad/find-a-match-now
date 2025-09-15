@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      applications: {
+        Row: {
+          candidate_id: string
+          created_at: string
+          id: string
+          message: string | null
+          vacancy_id: string
+        }
+        Insert: {
+          candidate_id: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          vacancy_id: string
+        }
+        Update: {
+          candidate_id?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          vacancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_vacancy_id_fkey"
+            columns: ["vacancy_id"]
+            isOneToOne: false
+            referencedRelation: "vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
           company_name: string
@@ -82,6 +121,129 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      resume_access: {
+        Row: {
+          has_access: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          has_access?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          has_access?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_access_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resumes: {
+        Row: {
+          candidate_id: string
+          created_at: string
+          education: Json | null
+          email: string
+          experience: Json | null
+          full_name: string
+          id: string
+          phone: string
+          skills: string[] | null
+          summary: string | null
+          views: number
+        }
+        Insert: {
+          candidate_id: string
+          created_at?: string
+          education?: Json | null
+          email: string
+          experience?: Json | null
+          full_name: string
+          id?: string
+          phone: string
+          skills?: string[] | null
+          summary?: string | null
+          views?: number
+        }
+        Update: {
+          candidate_id?: string
+          created_at?: string
+          education?: Json | null
+          email?: string
+          experience?: Json | null
+          full_name?: string
+          id?: string
+          phone?: string
+          skills?: string[] | null
+          summary?: string | null
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resumes_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vacancies: {
+        Row: {
+          created_at: string
+          description: string | null
+          employer_id: string
+          employment_type: string | null
+          id: string
+          location: string | null
+          salary_max: number | null
+          salary_min: number | null
+          title: string
+          views: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          employer_id: string
+          employment_type?: string | null
+          id?: string
+          location?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          title: string
+          views?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          employer_id?: string
+          employment_type?: string | null
+          id?: string
+          location?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          title?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vacancies_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
