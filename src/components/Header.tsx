@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, User, Briefcase, FileText } from 'lucide-react';
+import { LogOut, User, Briefcase, FileText, Database } from 'lucide-react';
 
 const Header = () => {
   const { user, profile, signOut } = useAuth();
@@ -33,9 +33,21 @@ const Header = () => {
     <header className="border-b bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
-          <Link to="/" className="text-xl font-bold text-primary">
-            Job Board
-          </Link>
+          <div className="flex items-center gap-8">
+            <Link to="/" className="text-xl font-bold text-primary">
+              Job Board
+            </Link>
+            
+            <nav className="flex items-center gap-6">
+              <Link 
+                to="/resumes" 
+                className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Database className="w-4 h-4" />
+                База резюме
+              </Link>
+            </nav>
+          </div>
           
           {user ? (
             <DropdownMenu>
