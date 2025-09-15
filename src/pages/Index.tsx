@@ -25,11 +25,9 @@ const Index = () => {
   useEffect(() => {
     if (!authLoading && user && !profile) {
       setShowCompleteProfile(true);
-    } else if (!authLoading && user && profile) {
-      // If profile is complete, redirect to dashboard
-      navigate('/dashboard');
     }
-  }, [user, profile, authLoading, navigate]);
+    // Remove automatic redirect to dashboard - let guests view vacancies
+  }, [user, profile, authLoading]);
 
   // Загрузка вакансий из Supabase
   const fetchVacancies = async () => {

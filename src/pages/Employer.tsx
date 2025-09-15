@@ -3,11 +3,24 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from '@/components/ui/alert-dialog';
 import Header from '@/components/Header';
+import VacancyForm from '@/components/VacancyForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Eye, MapPin, DollarSign, Mail, Phone, User } from 'lucide-react';
+import { Plus, Eye, MapPin, DollarSign, Mail, Phone, User, Edit, Trash2 } from 'lucide-react';
 
 interface Vacancy {
   id: string;
@@ -44,6 +57,8 @@ const Employer = () => {
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showVacancyForm, setShowVacancyForm] = useState(false);
+  const [editingVacancy, setEditingVacancy] = useState<Vacancy | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -100,6 +115,41 @@ const Employer = () => {
     return new Date(dateString).toLocaleDateString('ru-RU');
   };
 
+  const handleEditVacancy = (vacancy: Vacancy) => {
+    setEditingVacancy(vacancy);
+    setShowVacancyForm(true);
+  };
+
+  const handleDeleteVacancy = async (vacancyId: string) => {
+    try {
+      const { error } = await supabase
+        .from('vacancies')
+        .delete()
+        .eq('id', vacancyId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Успешно",
+        description: "Вакансия удалена",
+      });
+      
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting vacancy:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить вакансию",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleVacancyFormClose = () => {
+    setShowVacancyForm(false);
+    setEditingVacancy(null);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -121,9 +171,9 @@ const Employer = () => {
             <h1 className="text-3xl font-bold">Кабинет работодателя</h1>
             <p className="text-muted-foreground">Управляйте вакансиями и просматривайте отклики</p>
           </div>
-          <Button>
+          <Button onClick={() => setShowVacancyForm(true)}>
             <Plus className="w-4 h-4 mr-2" />
-            Добавить вакансию
+            Новая вакансия
           </Button>
         </div>
 
@@ -144,61 +194,97 @@ const Employer = () => {
                   <div className="text-muted-foreground mb-4">
                     У вас пока нет размещенных вакансий
                   </div>
-                  <Button>
+                  <Button onClick={() => setShowVacancyForm(true)}>
                     <Plus className="w-4 h-4 mr-2" />
                     Создать первую вакансию
                   </Button>
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-6">
-                {vacancies.map((vacancy) => (
-                  <Card key={vacancy.id}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <CardTitle className="text-xl">{vacancy.title}</CardTitle>
-                          <CardDescription className="flex flex-wrap gap-4 mt-2">
-                            {vacancy.location && (
-                              <span className="flex items-center">
-                                <MapPin className="w-4 h-4 mr-1" />
-                                {vacancy.location}
-                              </span>
-                            )}
-                            <span className="flex items-center">
-                              <DollarSign className="w-4 h-4 mr-1" />
-                              {formatSalary(vacancy.salary_min, vacancy.salary_max)}
-                            </span>
-                            <span className="flex items-center">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Список вакансий</CardTitle>
+                  <CardDescription>
+                    Управляйте своими вакансиями
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Название</TableHead>
+                        <TableHead>Дата создания</TableHead>
+                        <TableHead>Просмотры</TableHead>
+                        <TableHead>Статус</TableHead>
+                        <TableHead className="text-right">Действия</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {vacancies.map((vacancy) => (
+                        <TableRow key={vacancy.id}>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{vacancy.title}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {vacancy.location && (
+                                  <span className="flex items-center">
+                                    <MapPin className="w-3 h-3 mr-1" />
+                                    {vacancy.location}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{formatDate(vacancy.created_at)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center">
                               <Eye className="w-4 h-4 mr-1" />
-                              {vacancy.views} просмотров
-                            </span>
-                          </CardDescription>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <Badge variant="secondary">{vacancy.employment_type}</Badge>
-                          <span className="text-sm text-muted-foreground">
-                            {formatDate(vacancy.created_at)}
-                          </span>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground line-clamp-2">
-                        {vacancy.description}
-                      </p>
-                      <div className="flex gap-2 mt-4">
-                        <Button variant="outline" size="sm">
-                          Редактировать
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          Просмотреть
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                              {vacancy.views}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">Активна</Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex gap-2 justify-end">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditVacancy(vacancy)}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="outline" size="sm">
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Удалить вакансию?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Это действие нельзя отменить. Вакансия будет удалена навсегда.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Отмена</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDeleteVacancy(vacancy.id)}
+                                    >
+                                      Удалить
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
             )}
           </TabsContent>
 
@@ -212,70 +298,88 @@ const Employer = () => {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-4">
-                {applications.map((application) => (
-                  <Card key={application.id}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg">
-                            Отклик на "{application.vacancies.title}"
-                          </CardTitle>
-                          <CardDescription>
-                            {formatDate(application.created_at)}
-                          </CardDescription>
-                        </div>
-                        <Badge variant={application.applied_by === 'candidate' ? 'default' : 'secondary'}>
-                          {application.applied_by === 'candidate' ? 'Кандидат' : 'Гость'}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid gap-2">
-                        <div className="flex items-center gap-2">
-                          <User className="w-4 h-4" />
-                          <span>
-                            {application.applied_by === 'candidate' 
-                              ? 'Зарегистрированный пользователь'
-                              : application.guest_name
-                            }
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4" />
-                          <span>
-                            {application.applied_by === 'candidate' 
-                              ? application.profiles?.email
-                              : application.guest_email
-                            }
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Phone className="w-4 h-4" />
-                          <span>
-                            {application.applied_by === 'candidate' 
-                              ? application.profiles?.phone
-                              : application.guest_phone
-                            }
-                          </span>
-                        </div>
-                      </div>
-                      {application.message && (
-                        <div>
-                          <h4 className="font-medium mb-2">Сопроводительное письмо:</h4>
-                          <p className="text-muted-foreground whitespace-pre-wrap">
-                            {application.message}
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Отклики на вакансии</CardTitle>
+                  <CardDescription>
+                    Список всех откликов на ваши вакансии
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Вакансия</TableHead>
+                        <TableHead>Кандидат</TableHead>
+                        <TableHead>Контакты</TableHead>
+                        <TableHead>Дата отклика</TableHead>
+                        <TableHead>Тип</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {applications.map((application) => (
+                        <TableRow key={application.id}>
+                          <TableCell>
+                            <div className="font-medium">
+                              {application.vacancies.title}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4" />
+                              <span>
+                                {application.applied_by === 'candidate' 
+                                  ? 'Зарегистрированный пользователь'
+                                  : application.guest_name
+                                }
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Mail className="w-3 h-3" />
+                                <span>
+                                  {application.applied_by === 'candidate' 
+                                    ? application.profiles?.email
+                                    : application.guest_email
+                                  }
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm">
+                                <Phone className="w-3 h-3" />
+                                <span>
+                                  {application.applied_by === 'candidate' 
+                                    ? application.profiles?.phone
+                                    : application.guest_phone
+                                  }
+                                </span>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{formatDate(application.created_at)}</TableCell>
+                          <TableCell>
+                            <Badge variant={application.applied_by === 'candidate' ? 'default' : 'secondary'}>
+                              {application.applied_by === 'candidate' ? 'Кандидат' : 'Гость'}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
             )}
           </TabsContent>
         </Tabs>
       </div>
+
+      <VacancyForm
+        open={showVacancyForm}
+        onOpenChange={handleVacancyFormClose}
+        onSubmit={fetchData}
+        vacancy={editingVacancy}
+      />
     </div>
   );
 };

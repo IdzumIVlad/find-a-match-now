@@ -78,11 +78,22 @@ const VacancyDetail = () => {
   };
 
   const incrementViews = async () => {
+    if (!id) return;
+    
     try {
-      await supabase
+      // First get current views count
+      const { data: currentVacancy } = await supabase
         .from('vacancies')
-        .update({ views: vacancy?.views || 0 + 1 })
-        .eq('id', id);
+        .select('views')
+        .eq('id', id)
+        .single();
+      
+      if (currentVacancy) {
+        await supabase
+          .from('vacancies')
+          .update({ views: (currentVacancy.views || 0) + 1 })
+          .eq('id', id);
+      }
     } catch (error) {
       console.error('Error incrementing views:', error);
     }
