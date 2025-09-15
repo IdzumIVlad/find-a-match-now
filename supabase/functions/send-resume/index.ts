@@ -139,9 +139,9 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Job Platform <onboarding@resend.dev>",
+      from: "laburoGO <noreply@laburogo.com>",
       to: [employerEmail],
-      subject: `Новое резюме от ${resumeData.full_name}`,
+      subject: `Резюме от ${resumeData.full_name}`,
       html: emailBody,
     });
 
