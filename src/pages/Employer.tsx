@@ -82,21 +82,32 @@ const Employer = () => {
 
       if (vacanciesError) throw vacanciesError;
 
-      // Fetch applications for employer's vacancies
+      // Fetch applications using secure view
       const { data: applicationsData, error: applicationsError } = await supabase
-        .from('applications')
-        .select(`
-          *,
-          profiles!applications_candidate_id_fkey (email, phone),
-          vacancies!applications_vacancy_id_fkey (title, employer_id)
-        `)
-        .eq('vacancies.employer_id', user?.id)
+        .from('applications_for_employers')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (applicationsError) throw applicationsError;
 
+      // Fetch vacancy details separately for applications
+      const applicationPromises = (applicationsData || []).map(async (app) => {
+        const { data: vacancyData } = await supabase
+          .from('vacancies')
+          .select('title, employer_id')
+          .eq('id', app.vacancy_id)
+          .single();
+        
+        return {
+          ...app,
+          vacancies: vacancyData
+        };
+      });
+
+      const applicationsWithVacancies = await Promise.all(applicationPromises);
+
       setVacancies(vacanciesData || []);
-      setApplications((applicationsData || []).map(app => ({
+      setApplications((applicationsWithVacancies || []).map(app => ({
         ...app,
         applied_by: app.applied_by as 'candidate' | 'guest'
       })));
