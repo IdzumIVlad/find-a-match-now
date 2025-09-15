@@ -188,7 +188,7 @@ const Index = () => {
       <footer className="bg-muted py-8 mt-16">
         <div className="container mx-auto px-4 text-center">
           <p className="text-muted-foreground">
-            © 2024 JobBoard MVP. Простая платформа для поиска работы.
+            © 2024 laburoGO. Простая платформа для поиска работы.
           </p>
         </div>
       </footer>

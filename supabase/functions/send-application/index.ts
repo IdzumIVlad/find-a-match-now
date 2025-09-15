@@ -64,7 +64,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         <hr>
         <p style="color: #666; font-size: 14px;">
-          Этот отклик был отправлен через JobBoard MVP
+          Этот отклик был отправлен через laburoGO
         </p>
       `,
     });
