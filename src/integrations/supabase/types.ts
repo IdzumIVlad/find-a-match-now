@@ -373,7 +373,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      jobs_public: {
+        Row: {
+          company_name: string | null
+          created_at: string | null
+          description: string | null
+          employment_type: string | null
+          id: string | null
+          location: string | null
+          requirements: string | null
+          salary: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          employment_type?: string | null
+          id?: string | null
+          location?: string | null
+          requirements?: string | null
+          salary?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          employment_type?: string | null
+          id?: string | null
+          location?: string | null
+          requirements?: string | null
+          salary?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_job_contact_info: {
