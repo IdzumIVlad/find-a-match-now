@@ -1,63 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { JobCard } from "@/components/JobCard";
 import { JobForm } from "@/components/JobForm";
 import { ApplicationForm } from "@/components/ApplicationForm";
 import { Plus, Search, Briefcase, Users, TrendingUp } from "lucide-react";
-
-// Mock данные для демонстрации
-const mockJobs = [
-  {
-    id: "1",
-    title: "Frontend разработчик",
-    company: "ТехноСтарт",
-    location: "Москва",
-    salary: "от 120 000 ₽",
-    type: "Полная занятость",
-    description: "Ищем опытного Frontend разработчика для работы над инновационными проектами. Требуется знание React, TypeScript, современных инструментов разработки.",
-    postedDate: "2 дня назад",
-    email: "hr@technostart.ru"
-  },
-  {
-    id: "2", 
-    title: "UX/UI дизайнер",
-    company: "Креативные решения",
-    location: "Санкт-Петербург",
-    salary: "от 80 000 ₽",
-    type: "Удаленная работа",
-    description: "Требуется творческий UX/UI дизайнер для создания пользовательских интерфейсов мобильных и веб-приложений. Опыт работы с Figma обязателен.",
-    postedDate: "1 день назад",
-    email: "design@creative.ru"
-  },
-  {
-    id: "3",
-    title: "Python разработчик",
-    company: "DataTech",
-    location: "Новосибирск",
-    salary: "от 100 000 ₽",
-    type: "Полная занятость",
-    description: "Разработка backend сервисов на Python/Django. Опыт работы с базами данных, API, знание Docker приветствуется.",
-    postedDate: "3 дня назад",
-    email: "hr@datatech.com"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
-  const [jobs, setJobs] = useState(mockJobs);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showJobForm, setShowJobForm] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
+  const { toast } = useToast();
+
+  // Загрузка вакансий из Supabase
+  const fetchJobs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('jobs')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      setJobs(data || []);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить вакансии",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
 
   const filteredJobs = jobs.filter(job =>
     job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.location.toLowerCase().includes(searchTerm.toLowerCase())
+    job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleAddJob = (newJob: any) => {
-    setJobs([newJob, ...jobs]);
+  const handleAddJob = () => {
+    fetchJobs(); // Перезагружаем вакансии после добавления
   };
 
   const handleApply = (jobId: string) => {
@@ -66,6 +62,18 @@ const Index = () => {
       setSelectedJob(job);
       setShowApplicationForm(true);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return "сегодня";
+    if (diffDays === 2) return "вчера";
+    if (diffDays <= 7) return `${diffDays - 1} дня назад`;
+    return date.toLocaleDateString("ru-RU");
   };
 
   return (
@@ -139,7 +147,13 @@ const Index = () => {
             </h2>
           </div>
 
-          {filteredJobs.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="text-muted-foreground text-lg">
+                Загрузка вакансий...
+              </div>
+            </div>
+          ) : filteredJobs.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-muted-foreground text-lg mb-4">
                 {searchTerm ? "Вакансии не найдены" : "Пока нет размещенных вакансий"}
@@ -154,7 +168,14 @@ const Index = () => {
               {filteredJobs.map((job) => (
                 <JobCard
                   key={job.id}
-                  {...job}
+                  id={job.id}
+                  title={job.title}
+                  company={job.company_name}
+                  location={job.location || "Не указано"}
+                  salary={job.salary || "По договоренности"}
+                  type={job.employment_type || "Не указано"}
+                  description={job.description || ""}
+                  postedDate={formatDate(job.created_at)}
                   onApply={handleApply}
                 />
               ))}
@@ -184,8 +205,8 @@ const Index = () => {
           open={showApplicationForm}
           onOpenChange={setShowApplicationForm}
           jobTitle={selectedJob.title}
-          companyName={selectedJob.company}
-          employerEmail={selectedJob.email}
+          companyName={selectedJob.company_name}
+          employerEmail={selectedJob.employer_email}
         />
       )}
     </div>
