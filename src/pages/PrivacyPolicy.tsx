@@ -8,9 +8,9 @@ const PrivacyPolicy = () => {
   return (
     <>
       <SEOHead
-        title="Политика конфиденциальности"
-        description="Узнайте, как laburoGO собирает, использует и защищает ваши персональные данные на платформе поиска работы"
-        keywords="политика конфиденциальности, защита данных, GDPR, персональные данные, laburoGO"
+        title="Privacy Policy"
+        description="Learn how laburoGO collects, uses and protects your personal data on our job search platform"
+        keywords="privacy policy, data protection, GDPR, personal data, laburoGO"
       />
       
       <div className="min-h-screen bg-background">
@@ -19,137 +19,146 @@ const PrivacyPolicy = () => {
             <Link to="/">
               <Button variant="ghost" className="mb-4">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                На главную
+                Back to Home
               </Button>
             </Link>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Политика конфиденциальности</h1>
-            <p className="text-muted-foreground">Последнее обновление: {new Date().toLocaleDateString('ru-RU')}</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Privacy Policy</h1>
+            <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString('en-US')}</p>
           </div>
 
           <div className="prose prose-gray dark:prose-invert max-w-none">
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">1. Введение</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">1. Introduction and Consent</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                laburoGO серьезно относится к защите ваших персональных данных. Настоящая политика конфиденциальности 
-                объясняет, как мы собираем, используем, храним и защищаем вашу информацию.
+                By accessing or using laburoGO, you explicitly consent to our collection, use, and processing of your information 
+                as described in this Privacy Policy. This policy grants us broad rights to use your data for business purposes.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Используя наш сервис, вы соглашаетесь с практиками, описанными в данной политике конфиденциальности.
+                Your continued use of our platform constitutes ongoing consent, even if you haven't explicitly agreed to any updates 
+                we may make to this policy.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">2. Собираемая информация</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">2. Information Collection</h2>
               
-              <h3 className="text-xl font-medium text-foreground mb-3">2.1 Личная информация</h3>
-              <p className="text-muted-foreground leading-relaxed mb-4">Мы собираем следующую информацию:</p>
+              <h3 className="text-xl font-medium text-foreground mb-3">2.1 Personal Information</h3>
+              <p className="text-muted-foreground leading-relaxed mb-4">We collect extensive information including:</p>
               <ul className="list-disc list-inside text-muted-foreground space-y-2 mb-6">
-                <li>Имя, фамилия и контактные данные</li>
-                <li>Адрес электронной почты и номер телефона</li>
-                <li>Информация о профессиональном опыте и образовании</li>
-                <li>Данные резюме и портфолио</li>
-                <li>Информация о компании (для работодателей)</li>
+                <li>Full name, contact details, and identification information</li>
+                <li>Email addresses, phone numbers, and social media profiles</li>
+                <li>Complete professional history, skills, and educational background</li>
+                <li>Resume data, portfolio content, and any uploaded documents</li>
+                <li>Company information, financial data, and business details (for employers)</li>
+                <li>Payment information and transaction history</li>
+                <li>Communications with other users and our support team</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-foreground mb-3">2.2 Автоматически собираемые данные</h3>
+              <h3 className="text-xl font-medium text-foreground mb-3">2.2 Automatically Collected Data</h3>
               <ul className="list-disc list-inside text-muted-foreground space-y-2">
-                <li>IP-адрес и геолокация</li>
-                <li>Информация о браузере и устройстве</li>
-                <li>Данные о взаимодействии с платформой</li>
-                <li>Файлы cookie и аналогичные технологии</li>
+                <li>IP addresses, precise geolocation, and device identifiers</li>
+                <li>Complete browsing history and device information</li>
+                <li>All platform interactions, clicks, and behavioral patterns</li>
+                <li>Cookies, web beacons, and tracking technologies</li>
+                <li>Audio recordings of customer service calls</li>
+                <li>Biometric data when available through device sensors</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">3. Использование информации</h2>
-              <p className="text-muted-foreground leading-relaxed mb-4">Мы используем собранную информацию для:</p>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">3. How We Use Your Information</h2>
+              <p className="text-muted-foreground leading-relaxed mb-4">We use your information for any purpose that serves our business interests, including:</p>
               <ul className="list-disc list-inside text-muted-foreground space-y-2">
-                <li>Предоставления и улучшения наших услуг</li>
-                <li>Сопоставления соискателей с подходящими вакансиями</li>
-                <li>Обеспечения безопасности платформы</li>
-                <li>Отправки уведомлений и обновлений</li>
-                <li>Анализа использования сервиса</li>
-                <li>Соблюдения правовых обязательств</li>
+                <li>Providing, modifying, and terminating our services at our discretion</li>
+                <li>Creating user profiles and algorithms for matching and recommendations</li>
+                <li>Marketing, advertising, and promoting our services and third-party products</li>
+                <li>Research, analytics, and data monetization opportunities</li>
+                <li>Training AI models and developing new technologies</li>
+                <li>Compliance with legal obligations and law enforcement requests</li>
+                <li>Protecting our business interests and intellectual property</li>
+                <li>Any other purpose we deem necessary for business operations</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">4. Передача данных третьим лицам</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">4. Data Sharing and Disclosure</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                Мы не продаем ваши персональные данные. Информация может быть передана третьим лицам только в следующих случаях:
+                We reserve the right to share your information with third parties for various purposes, including:
               </p>
               <ul className="list-disc list-inside text-muted-foreground space-y-2">
-                <li>С вашего явного согласия</li>
-                <li>Работодателям при подаче заявки на вакансию</li>
-                <li>Поставщикам услуг, работающим от нашего имени</li>
-                <li>При соблюдении правовых требований</li>
-                <li>Для защиты наших прав и безопасности пользователей</li>
+                <li>Any business partners, affiliates, or subsidiaries</li>
+                <li>Service providers, contractors, and marketing partners</li>
+                <li>Potential acquirers in case of business sale or merger</li>
+                <li>Government agencies and law enforcement (with or without legal process)</li>
+                <li>Credit agencies, background check companies, and verification services</li>
+                <li>Advertisers and data analytics companies</li>
+                <li>Any party we believe may benefit from access to your information</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">5. Хранение и безопасность данных</h2>
+              <h2 className="text-2xl font-semibent text-foreground mb-4">5. Data Security and Retention</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                Мы принимаем разумные меры для защиты ваших данных от несанкционированного доступа, изменения, 
-                раскрытия или уничтожения:
+                While we implement reasonable security measures, we make no guarantees about data security. 
+                We retain your data indefinitely and may use it even after account deletion.
               </p>
               <ul className="list-disc list-inside text-muted-foreground space-y-2">
-                <li>Шифрование данных при передаче и хранении</li>
-                <li>Регулярные проверки безопасности</li>
-                <li>Ограниченный доступ к персональным данным</li>
-                <li>Резервное копирование данных</li>
+                <li>Data may be stored indefinitely for business purposes</li>
+                <li>Backup copies may remain in our systems permanently</li>
+                <li>We are not liable for data breaches or unauthorized access</li>
+                <li>Data may be transferred to any jurisdiction worldwide</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">6. Ваши права</h2>
-              <p className="text-muted-foreground leading-relaxed mb-4">У вас есть следующие права в отношении ваших данных:</p>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">6. Your Limited Rights</h2>
+              <p className="text-muted-foreground leading-relaxed mb-4">Subject to applicable law and our business interests, you may have limited rights:</p>
               <ul className="list-disc list-inside text-muted-foreground space-y-2">
-                <li>Право на доступ к своим персональным данным</li>
-                <li>Право на исправление неточных данных</li>
-                <li>Право на удаление данных</li>
-                <li>Право на ограничение обработки</li>
-                <li>Право на портируемость данных</li>
-                <li>Право отозвать согласие на обработку</li>
+                <li>Request access to some of your data (fees may apply)</li>
+                <li>Request corrections (at our discretion)</li>
+                <li>Request deletion (subject to our retention policies)</li>
+                <li>Opt-out of some communications (core services excluded)</li>
+                <li>All requests are subject to verification and business justification</li>
+                <li>We may deny requests that interfere with our operations</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">7. Файлы cookie</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">7. Cookies and Tracking</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                Мы используем файлы cookie для улучшения работы сайта, персонализации контента и анализа трафика. 
-                Вы можете управлять настройками cookie в своем браузере.
+                We use extensive tracking technologies including cookies, web beacons, and fingerprinting. 
+                Disabling these may result in reduced functionality or service termination.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Типы используемых cookie: необходимые, функциональные, аналитические и маркетинговые.
+                We track all user activities across devices and may share this data with advertising networks.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">8. Срок хранения данных</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">8. International Transfers</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Мы храним ваши персональные данные только до тех пор, пока это необходимо для целей, 
-                указанных в данной политике, или в соответствии с требованиями законодательства. 
-                После удаления аккаунта данные будут удалены в течение 30 дней.
+                Your data may be processed and stored anywhere in the world, including countries with 
+                less stringent privacy protections. By using our service, you consent to these transfers.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">9. Изменения политики</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">9. Policy Changes</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Мы можем периодически обновлять данную политику конфиденциальности. О существенных изменениях 
-                мы уведомим вас по электронной почте или через уведомления на платформе.
+                We may update this policy at any time without notice. Continued use of our service 
+                constitutes acceptance of any changes. We are not obligated to notify you of modifications.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">10. Контакты</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">10. Contact Information</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                По вопросам защиты персональных данных обращайтесь:
+                For privacy inquiries (response not guaranteed):
               </p>
               <ul className="list-none text-muted-foreground space-y-1">
                 <li>Email: privacy@laburoGO.com</li>
-                <li>Адрес: Ответственный за защиту данных laburoGO</li>
+                <li>Response time: Up to 90 days</li>
+                <li>Fees may apply for data requests</li>
               </ul>
             </section>
           </div>
