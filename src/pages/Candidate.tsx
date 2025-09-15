@@ -16,6 +16,13 @@ interface Application {
   id: string;
   message: string;
   created_at: string;
+  applied_by: 'candidate' | 'guest';
+  resume_id?: string;
+  resume_file_url?: string;
+  resume_link?: string;
+  guest_name?: string;
+  guest_email?: string;
+  guest_phone?: string;
   vacancies: {
     id: string;
     title: string;
@@ -78,7 +85,10 @@ const Candidate = () => {
 
       if (resumesError) throw resumesError;
 
-      setApplications(applicationsData || []);
+      setApplications((applicationsData || []).map(app => ({
+        ...app,
+        applied_by: app.applied_by as 'candidate' | 'guest'
+      })));
       setResumes((resumesData || []).map(resume => ({
         ...resume,
         experience: resume.experience as any[],
@@ -223,21 +233,55 @@ const Candidate = () => {
                             </span>
                           </CardDescription>
                         </div>
-                        <Badge variant="secondary">
-                          {application.vacancies.employment_type}
-                        </Badge>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge variant="secondary">
+                            {application.vacancies.employment_type}
+                          </Badge>
+                          <div className="text-xs text-muted-foreground">
+                            {application.applied_by === 'candidate' ? 'Авторизованный' : 'Гость'}
+                          </div>
+                        </div>
                       </div>
                     </CardHeader>
-                    {application.message && (
-                      <CardContent>
+                    <CardContent className="space-y-4">
+                      {/* Resume info */}
+                      {(application.resume_id || application.resume_file_url || application.resume_link) && (
                         <div>
-                          <h4 className="font-medium mb-2">Ваше сопроводительное письмо:</h4>
+                          <h4 className="font-medium mb-2">Резюме:</h4>
+                          {application.resume_id && (
+                            <Button variant="outline" size="sm" asChild>
+                              <Link to={`/resumes/${application.resume_id}`}>
+                                Открыть резюме
+                              </Link>
+                            </Button>
+                          )}
+                          {application.resume_file_url && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={application.resume_file_url} target="_blank" rel="noopener noreferrer">
+                                Скачать файл
+                              </a>
+                            </Button>
+                          )}
+                          {application.resume_link && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={application.resume_link} target="_blank" rel="noopener noreferrer">
+                                Открыть ссылку
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Message */}
+                      {application.message && (
+                        <div>
+                          <h4 className="font-medium mb-2">Сопроводительное письмо:</h4>
                           <p className="text-muted-foreground whitespace-pre-wrap">
                             {application.message}
                           </p>
                         </div>
-                      </CardContent>
-                    )}
+                      )}
+                    </CardContent>
                   </Card>
                 ))}
               </div>

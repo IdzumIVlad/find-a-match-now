@@ -24,6 +24,9 @@ export type Database = {
           guest_phone: string | null
           id: string
           message: string | null
+          resume_file_url: string | null
+          resume_id: string | null
+          resume_link: string | null
           vacancy_id: string
         }
         Insert: {
@@ -35,6 +38,9 @@ export type Database = {
           guest_phone?: string | null
           id?: string
           message?: string | null
+          resume_file_url?: string | null
+          resume_id?: string | null
+          resume_link?: string | null
           vacancy_id: string
         }
         Update: {
@@ -46,6 +52,9 @@ export type Database = {
           guest_phone?: string | null
           id?: string
           message?: string | null
+          resume_file_url?: string | null
+          resume_id?: string | null
+          resume_link?: string | null
           vacancy_id?: string
         }
         Relationships: [
@@ -54,6 +63,13 @@ export type Database = {
             columns: ["candidate_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
             referencedColumns: ["id"]
           },
           {

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Header from '@/components/Header';
+import ApplicationModal from '@/components/ApplicationModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -35,14 +36,7 @@ const VacancyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [vacancy, setVacancy] = useState<Vacancy | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showApplicationForm, setShowApplicationForm] = useState(false);
-  const [applicationLoading, setApplicationLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    message: '',
-    guest_name: '',
-    guest_email: '',
-    guest_phone: ''
-  });
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
 
@@ -81,64 +75,6 @@ const VacancyDetail = () => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleApply = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!id) return;
-
-    setApplicationLoading(true);
-    
-    try {
-      const applicationData = user && profile?.role === 'candidate' 
-        ? {
-            vacancy_id: id,
-            candidate_id: user.id,
-            message: formData.message || null,
-            applied_by: 'candidate' as const
-          }
-        : {
-            vacancy_id: id,
-            candidate_id: null,
-            message: formData.message || null,
-            guest_name: formData.guest_name,
-            guest_email: formData.guest_email,  
-            guest_phone: formData.guest_phone,
-            applied_by: 'guest' as const
-          };
-
-      const { error } = await supabase
-        .from('applications')
-        .insert(applicationData);
-
-      if (error) {
-        if (error.code === '23505') {
-          toast({
-            title: "Внимание",
-            description: "Вы уже откликались на эту вакансию",
-            variant: "destructive",
-          });
-        } else {
-          throw error;
-        }
-      } else {
-        toast({
-          title: "Успешно",
-          description: "Отклик отправлен",
-        });
-        setShowApplicationForm(false);
-        setFormData({ message: '', guest_name: '', guest_email: '', guest_phone: '' });
-      }
-    } catch (error) {
-      console.error('Error submitting application:', error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось отправить отклик",
-        variant: "destructive",
-      });
-    } finally {
-      setApplicationLoading(false);
     }
   };
 
@@ -266,7 +202,7 @@ const VacancyDetail = () => {
               <CardContent>
                 <Button 
                   className="w-full" 
-                  onClick={() => setShowApplicationForm(true)}
+                  onClick={() => setShowApplicationModal(true)}
                 >
                   Отправить отклик
                 </Button>
@@ -281,72 +217,13 @@ const VacancyDetail = () => {
         </div>
       </div>
 
-      {/* Application Form Modal */}
-      <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Откликнуться на вакансию</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleApply} className="space-y-4">
-            {(!user || profile?.role !== 'candidate') && (
-              <>
-                <div>
-                  <Label htmlFor="guest_name">Имя *</Label>
-                  <Input
-                    id="guest_name"
-                    value={formData.guest_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, guest_name: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="guest_email">Email *</Label>
-                  <Input
-                    id="guest_email"
-                    type="email"
-                    value={formData.guest_email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, guest_email: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="guest_phone">Телефон *</Label>
-                  <Input
-                    id="guest_phone"
-                    type="tel"
-                    value={formData.guest_phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, guest_phone: e.target.value }))}
-                    required
-                  />
-                </div>
-              </>
-            )}
-            <div>
-              <Label htmlFor="message">Сопроводительное письмо</Label>
-              <Textarea
-                id="message"
-                value={formData.message}
-                onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                placeholder="Расскажите о себе и почему вас интересует эта позиция"
-                rows={4}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button type="submit" disabled={applicationLoading} className="flex-1">
-                {applicationLoading ? 'Отправляем...' : 'Отправить отклик'}
-              </Button>
-              <Button type="button" variant="outline" onClick={() => setShowApplicationForm(false)}>
-                Отмена
-              </Button>
-            </div>
-            {!user && (
-              <p className="text-sm text-muted-foreground text-center">
-                После отправки отклика рекомендуем <Link to="/auth" className="text-primary hover:underline">создать аккаунт</Link>
-              </p>
-            )}
-          </form>
-        </DialogContent>
-      </Dialog>
+      {/* Application Modal */}
+      <ApplicationModal
+        open={showApplicationModal}
+        onOpenChange={setShowApplicationModal}
+        vacancyId={id || ''}
+        vacancyTitle={vacancy?.title || ''}
+      />
     </div>
   );
 };

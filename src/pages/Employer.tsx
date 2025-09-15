@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,6 +44,9 @@ interface Application {
   guest_name?: string;
   guest_email?: string;
   guest_phone?: string;
+  resume_id?: string;
+  resume_file_url?: string;
+  resume_link?: string;
   vacancy_id: string;
   profiles?: {
     email: string;
@@ -50,6 +54,7 @@ interface Application {
   } | null;
   vacancies: {
     title: string;
+    employer_id: string;
   };
 }
 
@@ -77,20 +82,24 @@ const Employer = () => {
 
       if (vacanciesError) throw vacanciesError;
 
-      // Fetch applications
+      // Fetch applications for employer's vacancies
       const { data: applicationsData, error: applicationsError } = await supabase
         .from('applications')
         .select(`
           *,
           profiles!applications_candidate_id_fkey (email, phone),
-          vacancies!applications_vacancy_id_fkey (title)
+          vacancies!applications_vacancy_id_fkey (title, employer_id)
         `)
+        .eq('vacancies.employer_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (applicationsError) throw applicationsError;
 
       setVacancies(vacanciesData || []);
-      setApplications((applicationsData as Application[]) || []);
+      setApplications((applicationsData || []).map(app => ({
+        ...app,
+        applied_by: app.applied_by as 'candidate' | 'guest'
+      })));
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -312,6 +321,7 @@ const Employer = () => {
                         <TableHead>Вакансия</TableHead>
                         <TableHead>Кандидат</TableHead>
                         <TableHead>Контакты</TableHead>
+                        <TableHead>Резюме</TableHead>
                         <TableHead>Дата отклика</TableHead>
                         <TableHead>Тип</TableHead>
                       </TableRow>
@@ -355,6 +365,34 @@ const Employer = () => {
                                   }
                                 </span>
                               </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              {application.resume_id && (
+                                <Button variant="outline" size="sm" asChild>
+                                  <Link to={`/resumes/${application.resume_id}`}>
+                                    Открыть резюме
+                                  </Link>
+                                </Button>
+                              )}
+                              {application.resume_file_url && (
+                                <Button variant="outline" size="sm" asChild>
+                                  <a href={application.resume_file_url} target="_blank" rel="noopener noreferrer">
+                                    Скачать файл
+                                  </a>
+                                </Button>
+                              )}
+                              {application.resume_link && (
+                                <Button variant="outline" size="sm" asChild>
+                                  <a href={application.resume_link} target="_blank" rel="noopener noreferrer">
+                                    Открыть ссылку
+                                  </a>
+                                </Button>
+                              )}
+                              {!application.resume_id && !application.resume_file_url && !application.resume_link && (
+                                <span className="text-sm text-muted-foreground">Резюме не приложено</span>
+                              )}
                             </div>
                           </TableCell>
                           <TableCell>{formatDate(application.created_at)}</TableCell>
