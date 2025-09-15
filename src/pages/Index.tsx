@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import VacancyCard from "@/components/VacancyCard";
-import { JobForm } from "@/components/JobForm";
+import VacancyForm from "@/components/VacancyForm";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
@@ -18,7 +18,7 @@ const Index = () => {
   const [vacancies, setVacancies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showJobForm, setShowJobForm] = useState(false);
+  const [showVacancyForm, setShowVacancyForm] = useState(false);
   const [showCompleteProfile, setShowCompleteProfile] = useState(false);
   const { toast } = useToast();
   const { user, profile, loading: authLoading, fetchProfile } = useAuth();
@@ -26,25 +26,14 @@ const Index = () => {
 
   // Check if user needs to complete profile
   useEffect(() => {
-    if (!authLoading && user && !profile) {
-      setShowCompleteProfile(true);
-    } else if (profile) {
-      // Если профиль есть, убираем модальное окно
-      setShowCompleteProfile(false);
+    if (!authLoading) {
+      if (user && !profile) {
+        setShowCompleteProfile(true);
+      } else {
+        setShowCompleteProfile(false);
+      }
     }
   }, [user, profile, authLoading]);
-
-  // Принудительно обновляем профиль при изменении пользователя
-  useEffect(() => {
-    if (user && !authLoading && !profile) {
-      // Небольшая задержка и попытка перезагрузить профиль
-      const timer = setTimeout(() => {
-        fetchProfile();
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [user, authLoading, profile, fetchProfile]);
 
   // Загрузка вакансий из Supabase (безопасно, без скрытых данных)
   const fetchVacancies = async () => {
@@ -131,7 +120,7 @@ const Index = () => {
               />
             </div>
             <Button 
-              onClick={() => setShowJobForm(true)}
+              onClick={() => setShowVacancyForm(true)}
               className="bg-accent hover:bg-accent/90 text-accent-foreground"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -190,7 +179,7 @@ const Index = () => {
               <div className="text-muted-foreground text-lg mb-4">
                 {searchTerm ? "Вакансии не найдены" : "Пока нет размещенных вакансий"}
               </div>
-              <Button onClick={() => setShowJobForm(true)} variant="outline">
+              <Button onClick={() => setShowVacancyForm(true)} variant="outline">
                 <Plus className="w-4 h-4 mr-2" />
                 Разместить первую вакансию
               </Button>
@@ -220,9 +209,9 @@ const Index = () => {
       <Footer />
 
       {/* Modals */}
-      <JobForm
-        open={showJobForm}
-        onOpenChange={setShowJobForm}
+      <VacancyForm
+        open={showVacancyForm}
+        onOpenChange={setShowVacancyForm}
         onSubmit={handleAddJob}
       />
 

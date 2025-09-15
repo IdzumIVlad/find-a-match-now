@@ -47,18 +47,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const fetchProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      setProfile(null);
+      return;
+    }
     
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
-    
-    if (!error && data) {
-      setProfile(data);
-    } else if (error) {
-      console.error('Error fetching profile:', error);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      if (!error) {
+        setProfile(data);
+      } else {
+        console.error('Error fetching profile:', error);
+        setProfile(null);
+      }
+    } catch (error) {
+      console.error('Unexpected error fetching profile:', error);
+      setProfile(null);
     }
   };
 
