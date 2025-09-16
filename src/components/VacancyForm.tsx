@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEventLogger } from '@/hooks/useEventLogger';
+import { useTranslation } from 'react-i18next';
 
 interface VacancyFormProps {
   open: boolean;
@@ -38,6 +39,7 @@ const VacancyForm = ({ open, onOpenChange, onSubmit, vacancy }: VacancyFormProps
   const { user } = useAuth();
   const { toast } = useToast();
   const { logEvent } = useEventLogger();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (vacancy) {
@@ -198,7 +200,7 @@ const VacancyForm = ({ open, onOpenChange, onSubmit, vacancy }: VacancyFormProps
                 id="location"
                 value={formData.location}
                 onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                placeholder="Москва, удаленно..."
+                placeholder={t('form.locationPlaceholder')}
               />
             </div>
 
@@ -212,11 +214,11 @@ const VacancyForm = ({ open, onOpenChange, onSubmit, vacancy }: VacancyFormProps
                   <SelectValue placeholder="Выберите тип" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Полная занятость">Полная занятость</SelectItem>
-                  <SelectItem value="Частичная занятость">Частичная занятость</SelectItem>
-                  <SelectItem value="Удаленная работа">Удаленная работа</SelectItem>
-                  <SelectItem value="Фриланс">Фриланс</SelectItem>
-                  <SelectItem value="Стажировка">Стажировка</SelectItem>
+                  <SelectItem value="Полная занятость">{t('employment.fullTime')}</SelectItem>
+                  <SelectItem value="Частичная занятость">{t('employment.partTime')}</SelectItem>
+                  <SelectItem value="Удаленная работа">{t('employment.remote')}</SelectItem>
+                  <SelectItem value="Фриланс">{t('employment.freelance')}</SelectItem>
+                  <SelectItem value="Стажировка">{t('employment.internship')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -224,7 +226,7 @@ const VacancyForm = ({ open, onOpenChange, onSubmit, vacancy }: VacancyFormProps
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="salary_min">Зарплата от (₽)</Label>
+              <Label htmlFor="salary_min">{t('form.salaryFrom')}</Label>
               <Input
                 id="salary_min"
                 type="number"
@@ -235,7 +237,7 @@ const VacancyForm = ({ open, onOpenChange, onSubmit, vacancy }: VacancyFormProps
             </div>
 
             <div>
-              <Label htmlFor="salary_max">Зарплата до (₽)</Label>
+              <Label htmlFor="salary_max">{t('form.salaryTo')}</Label>
               <Input
                 id="salary_max"
                 type="number"

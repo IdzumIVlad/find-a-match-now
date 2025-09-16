@@ -35,9 +35,9 @@ const VacancyCard = ({
   
   const formatSalary = (min?: number, max?: number) => {
     if (!min && !max) return t('vacancy.salaryNegotiable');
-    if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()} ₽`;
-    if (min) return `${t('vacancy.salaryFrom')} ${min.toLocaleString()} ₽`;
-    if (max) return `${t('vacancy.salaryTo')} ${max.toLocaleString()} ₽`;
+    if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()}`;
+    if (min) return `${t('vacancy.salaryFrom')} ${min.toLocaleString()}`;
+    if (max) return `${t('vacancy.salaryTo')} ${max.toLocaleString()}`;
     return t('vacancy.salaryNegotiable');
   };
 

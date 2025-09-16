@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
 interface JobFormProps {
   open: boolean;
@@ -17,6 +18,7 @@ interface JobFormProps {
 
 export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -129,7 +131,7 @@ export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
                 id="location"
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
-                placeholder="Москва, удаленно"
+                placeholder={t('form.locationPlaceholder')}
               />
             </div>
             
@@ -139,7 +141,7 @@ export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
                 id="salary"
                 value={formData.salary}
                 onChange={(e) => handleInputChange("salary", e.target.value)}
-                placeholder="от 100 000 ₽"
+                placeholder={t('form.salaryPlaceholder')}
               />
             </div>
           </div>
@@ -151,11 +153,11 @@ export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
                 <SelectValue placeholder="Выберите тип занятости" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Полная занятость">Полная занятость</SelectItem>
-                <SelectItem value="Частичная занятость">Частичная занятость</SelectItem>
-                <SelectItem value="Стажировка">Стажировка</SelectItem>
-                <SelectItem value="Проектная работа">Проектная работа</SelectItem>
-                <SelectItem value="Удаленная работа">Удаленная работа</SelectItem>
+                <SelectItem value="Полная занятость">{t('employment.fullTime')}</SelectItem>
+                <SelectItem value="Частичная занятость">{t('employment.partTime')}</SelectItem>
+                <SelectItem value="Стажировка">{t('employment.internship')}</SelectItem>
+                <SelectItem value="Проектная работа">{t('employment.project')}</SelectItem>
+                <SelectItem value="Удаленная работа">{t('employment.remote')}</SelectItem>
               </SelectContent>
             </Select>
           </div>

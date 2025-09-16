@@ -77,6 +77,21 @@ const resources = {
       "vacancy.salaryNegotiable": "Negotiable",
       "vacancy.salaryFrom": "from",
       "vacancy.salaryTo": "up to",
+      
+      // Employment types
+      "employment.fullTime": "Full-time",
+      "employment.partTime": "Part-time", 
+      "employment.internship": "Internship",
+      "employment.project": "Project work",
+      "employment.remote": "Remote work",
+      "employment.freelance": "Freelance",
+      
+      // Form placeholders
+      "form.locationPlaceholder": "Moscow, remote...",
+      "form.salaryPlaceholder": "from 100,000",
+      "form.salaryFrom": "Salary from",
+      "form.salaryTo": "Salary to",
+      "form.phone": "Phone",
       "vacancy.noDescription": "No description provided",
       "vacancy.apply": "Apply",
       "vacancy.views": "views",
@@ -167,7 +182,22 @@ const resources = {
       // Vacancy
       "vacancy.salaryNegotiable": "Negociable",
       "vacancy.salaryFrom": "desde",
-      "vacancy.salaryTo": "hasta", 
+      "vacancy.salaryTo": "hasta",
+      
+      // Employment types
+      "employment.fullTime": "Tiempo completo",
+      "employment.partTime": "Tiempo parcial",
+      "employment.internship": "Prácticas",
+      "employment.project": "Trabajo por proyecto",
+      "employment.remote": "Trabajo remoto",
+      "employment.freelance": "Freelance",
+      
+      // Form placeholders
+      "form.locationPlaceholder": "Madrid, remoto...",
+      "form.salaryPlaceholder": "desde 30,000",
+      "form.salaryFrom": "Salario desde",
+      "form.salaryTo": "Salario hasta",
+      "form.phone": "Teléfono",
       "vacancy.noDescription": "Sin descripción",
       "vacancy.apply": "Aplicar",
       "vacancy.views": "visualizaciones",
@@ -259,6 +289,21 @@ const resources = {
       "vacancy.salaryNegotiable": "Negociável",
       "vacancy.salaryFrom": "a partir de",
       "vacancy.salaryTo": "até",
+      
+      // Employment types
+      "employment.fullTime": "Tempo integral",
+      "employment.partTime": "Tempo parcial",
+      "employment.internship": "Estágio",
+      "employment.project": "Trabalho de projeto",
+      "employment.remote": "Trabalho remoto",
+      "employment.freelance": "Freelancer",
+      
+      // Form placeholders
+      "form.locationPlaceholder": "São Paulo, remoto...",
+      "form.salaryPlaceholder": "a partir de R$ 5.000",
+      "form.salaryFrom": "Salário de",
+      "form.salaryTo": "Salário até",
+      "form.phone": "Telefone",
       "vacancy.noDescription": "Sem descrição",
       "vacancy.apply": "Candidatar",
       "vacancy.views": "visualizações",
@@ -350,6 +395,21 @@ const resources = {
       "vacancy.salaryNegotiable": "По договоренности",
       "vacancy.salaryFrom": "от",
       "vacancy.salaryTo": "до",
+      
+      // Employment types
+      "employment.fullTime": "Полная занятость",
+      "employment.partTime": "Частичная занятость",
+      "employment.internship": "Стажировка",
+      "employment.project": "Проектная работа", 
+      "employment.remote": "Удаленная работа",
+      "employment.freelance": "Фриланс",
+      
+      // Form placeholders
+      "form.locationPlaceholder": "Москва, удаленно...",
+      "form.salaryPlaceholder": "от 100 000",
+      "form.salaryFrom": "Зарплата от",
+      "form.salaryTo": "Зарплата до",
+      "form.phone": "Телефон",
       "vacancy.noDescription": "Описание не указано",
       "vacancy.apply": "Откликнуться",
       "vacancy.views": "просмотров",
