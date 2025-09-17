@@ -37,12 +37,12 @@ const Index = () => {
     }
   }, [user, profile, authLoading]);
 
-  // Загрузка вакансий из Supabase (безопасно, без скрытых данных)
+  // Загрузка вакансий из Supabase (только публичные поля)
   const fetchVacancies = async () => {
     try {
       const { data, error } = await supabase
         .from('vacancies')
-        .select('*')
+        .select('id, title, description, location, salary_min, salary_max, employment_type, views, created_at')
         .order('created_at', { ascending: false });
 
       if (error) {

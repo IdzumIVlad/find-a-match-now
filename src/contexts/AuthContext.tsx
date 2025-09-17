@@ -57,18 +57,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, role, phone, created_at, updated_at')
         .eq('id', user.id)
         .maybeSingle();
       
-      if (error) {
-        console.error('Error fetching profile:', error);
+      if (data && !error) {
+        console.log('Profile data loaded:', data);
+        // Add email from auth.user for security (not from profiles table)
+        setProfile({
+          ...data,
+          email: user.email!
+        });
+      } else {
+        console.log('No profile found or error:', error);
         setProfile(null);
-        return;
       }
-      
-      console.log('Profile fetched:', data);
-      setProfile(data || null);
     } catch (error) {
       console.error('Unexpected error fetching profile:', error);
       setProfile(null);
@@ -91,17 +94,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSession(session);
           setUser(session?.user ?? null);
           
-          // Load profile if user exists
-          if (session?.user) {
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .maybeSingle();
-            
-            console.log('Initial profile loaded:', !!profileData);
-            setProfile(profileData || null);
-          }
+            // Load profile if user exists
+            if (session?.user) {
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('id, role, phone, created_at, updated_at')
+                .eq('id', session.user.id)
+                .maybeSingle();
+              
+              console.log('Initial profile loaded:', !!profileData);
+              if (profileData) {
+                setProfile({
+                  ...profileData,
+                  email: session.user.email!
+                });
+              } else {
+                setProfile(null);
+              }
+            }
         }
         
         setLoading(false);
@@ -124,11 +134,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === 'SIGNED_IN' && session?.user) {
           const { data: profileData } = await supabase
             .from('profiles')
-            .select('*')
+            .select('id, role, phone, created_at, updated_at')
             .eq('id', session.user.id)
             .maybeSingle();
           
-          setProfile(profileData || null);
+          if (profileData) {
+            setProfile({
+              ...profileData,
+              email: session.user.email!
+            });
+          } else {
+            setProfile(null);
+          }
         } else if (event === 'SIGNED_OUT') {
           setProfile(null);
         }
@@ -202,22 +219,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Сначала проверим, не существует ли уже профиль
     const { data: existingProfile } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, role, phone, created_at, updated_at')
       .eq('id', user.id)
       .maybeSingle();
 
     if (existingProfile) {
-      // Профиль уже существует, просто обновим состояние
-      setProfile(existingProfile);
+      // Профиль уже существует, просто обновим состояние с email из auth
+      setProfile({
+        ...existingProfile,
+        email: user.email!
+      });
       return { error: null };
     }
 
-    // Создаем новый профиль только если его нет
+    // Создаем новый профиль только если его нет (не сохраняем email в БД для безопасности)
     const { error } = await supabase
       .from('profiles')
       .insert({
         id: user.id,
-        email: user.email!,
         phone,
         role
       });

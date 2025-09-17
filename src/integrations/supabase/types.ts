@@ -358,6 +358,39 @@ export type Database = {
           },
         ]
       }
+      security_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          error_message: string | null
+          id: string
+          ip_address: unknown | null
+          table_name: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown | null
+          table_name: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown | null
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       vacancies: {
         Row: {
           created_at: string
@@ -685,6 +718,10 @@ export type Database = {
       }
     }
     Functions: {
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_job_contact_info: {
         Args: { job_id_param: string }
         Returns: {
@@ -753,6 +790,20 @@ export type Database = {
           summary: string
           views: number
         }[]
+      }
+      log_security_event: {
+        Args: {
+          action_name: string
+          error_msg?: string
+          table_name: string
+          user_agent_header?: string
+          user_ip?: unknown
+        }
+        Returns: undefined
+      }
+      validate_password_strength: {
+        Args: { password: string }
+        Returns: Json
       }
     }
     Enums: {

@@ -5,16 +5,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const { signIn, signUp, signInWithGoogle, user, profile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { validatePassword } = usePasswordValidation();
 
   useEffect(() => {
     // Only redirect logged-in users, not guests
@@ -48,6 +52,15 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setPasswordErrors([]);
+    
+    // Validate password strength
+    const validation = await validatePassword(password);
+    if (!validation.valid) {
+      setPasswordErrors(validation.errors);
+      setLoading(false);
+      return;
+    }
     
     const { error } = await signUp(email, password);
     
@@ -148,6 +161,17 @@ const Auth = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                  {passwordErrors.length > 0 && (
+                    <Alert className="mt-2">
+                      <AlertDescription>
+                        <ul className="list-disc pl-4">
+                          {passwordErrors.map((error, index) => (
+                            <li key={index} className="text-sm">{error}</li>
+                          ))}
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Регистрируемся...' : 'Зарегистрироваться'}
