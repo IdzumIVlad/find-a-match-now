@@ -5,7 +5,7 @@ import { useEventLogger } from '@/hooks/useEventLogger';
 
 interface Profile {
   id: string;
-  email: string;
+  email: string; // Email comes from auth.user, not stored in profiles table
   phone: string;
   role: 'employer' | 'candidate';
   created_at: string;
@@ -232,14 +232,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: null };
     }
 
-    // Создаем новый профиль только если его нет (не сохраняем email в БД для безопасности)
+    // Создаем новый профиль только если его нет (email хранится в auth.users для безопасности)
     const { error } = await supabase
       .from('profiles')
       .insert({
         id: user.id,
         phone,
         role
-      });
+      } as any); // Type assertion needed because email field was removed from DB
 
     if (!error) {
       await fetchProfile();
