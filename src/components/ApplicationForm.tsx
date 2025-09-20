@@ -9,6 +9,7 @@ import { Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEventLogger } from "@/hooks/useEventLogger";
 import { useRateLimit } from "@/hooks/useRateLimit";
+import { useTranslation } from "react-i18next";
 
 interface ApplicationFormProps {
   open: boolean;
@@ -19,11 +20,12 @@ interface ApplicationFormProps {
 }
 
 export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyName }: ApplicationFormProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { logEvent } = useEventLogger();
   const { checkRateLimit, recordApplication, isBlocked } = useRateLimit();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [honeypot, setHoneypot] = useState(''); // Антиспам honeypot
+  const [honeypot, setHoneypot] = useState('');
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -36,7 +38,6 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Проверка honeypot
     if (honeypot) {
       console.log('Spam detected via honeypot');
       return;
@@ -44,34 +45,28 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
     
     if (!formData.name || !formData.email) {
       toast({
-        title: "Ошибка",
-        description: "Пожалуйста, заполните все обязательные поля",
+        title: t("common.error"),
+        description: t("application.fieldsRequired"),
         variant: "destructive",
       });
       return;
     }
 
-    // Проверка rate limiting с использованием серверной функции
     const rateLimited = await checkRateLimit(jobId);
     if (rateLimited) {
       toast({
-        title: "Слишком много заявок",
-        description: "Повторная заявка будет доступна через 10 минут",
+        title: t("application.tooManyApplications"),
+        description: t("application.rateLimitDesc"),
         variant: "destructive",
       });
       return;
     }
 
     setIsSubmitting(true);
-    
-    // Блокируем кнопку на 10 секунд
     setButtonDisabled(true);
     setTimeout(() => setButtonDisabled(false), 10000);
 
     try {
-      // Получаем email работодателя через безопасную серверную функцию
-      // Эта функция требует service_role и вызывается только из edge function
-      
       const { data, error } = await supabase.functions.invoke('send-application', {
         body: {
           jobId: jobId,
@@ -81,7 +76,7 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
           applicantEmail: formData.email,
           applicantPhone: formData.phone,
           coverLetter: formData.coverLetter,
-          resumeLink: formData.resume, // Используем resume как resumeLink
+          resumeLink: formData.resume,
         },
       });
 
@@ -89,10 +84,9 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
         throw error;
       }
 
-      // Записываем в базу данных заявку  
       const { error: dbError } = await supabase.from('applications').insert({
         vacancy_id: jobId,
-        candidate_id: null, // Guest application
+        candidate_id: null,
         applied_by: 'guest',
         guest_name: formData.name,
         guest_email: formData.email,
@@ -103,13 +97,8 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
 
       if (dbError) {
         console.error('Database error:', dbError);
-        // Don't throw - email was sent successfully
       }
 
-      // Rate limit recording is now handled server-side automatically
-      // await recordApplication(jobId); - deprecated
-
-      // Логируем событие
       await logEvent('application_created', {
         job_id: jobId,
         job_title: jobTitle,
@@ -117,7 +106,6 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
         applicant_email: formData.email
       });
 
-      // Создаем запись в outbox для вебхука
       await supabase
         .from('outbox_webhooks')
         .insert({
@@ -142,14 +130,14 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
       onOpenChange(false);
       
       toast({
-        title: "Отклик отправлен!",
-        description: `Ваш отклик на вакансию "${jobTitle}" успешно отправлен в ${companyName}`,
+        title: t("application.success"),
+        description: t("application.successDesc", { title: jobTitle, company: companyName }),
       });
     } catch (error) {
       console.error("Error sending application:", error);
       toast({
-        title: "Ошибка отправки",
-        description: "Не удалось отправить отклик. Попробуйте еще раз.",
+        title: t("application.error"),
+        description: t("application.errorDesc"),
         variant: "destructive",
       });
     } finally {
@@ -167,29 +155,29 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Send className="w-5 h-5 text-primary" />
-            Отклик на вакансию
+            {t("application.title")}
           </DialogTitle>
           <DialogDescription>
-            <strong>{jobTitle}</strong> в компании {companyName}
+            <strong>{jobTitle}</strong> {t("application.companyAt", { company: companyName })}
             <br />
-            Заполните форму для отправки отклика. Поля отмеченные * обязательны.
+            {t("application.fillForm")}
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Полное имя *</Label>
+            <Label htmlFor="name">{t("application.fullName")}</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
-              placeholder="Иван Иванов"
+              placeholder={t("application.fullNamePlaceholder")}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="email">{t("auth.email")} *</Label>
             <Input
               id="email"
               type="email"
@@ -201,39 +189,38 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Телефон</Label>
+            <Label htmlFor="phone">{t("application.phone")}</Label>
             <Input
               id="phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => handleInputChange("phone", e.target.value)}
-              placeholder="+7 (999) 123-45-67"
+              placeholder={t("application.phonePlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="resume">Ссылка на резюме</Label>
+            <Label htmlFor="resume">{t("application.resumeLink")}</Label>
             <Input
               id="resume"
               type="text"
               value={formData.resume}
               onChange={(e) => handleInputChange("resume", e.target.value)}
-              placeholder="example.com/resume.pdf или https://example.com/resume.pdf"
+              placeholder={t("application.resumeLinkPlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="coverLetter">Сопроводительное письмо</Label>
+            <Label htmlFor="coverLetter">{t("application.coverLetter")}</Label>
             <Textarea
               id="coverLetter"
               value={formData.coverLetter}
               onChange={(e) => handleInputChange("coverLetter", e.target.value)}
-              placeholder="Расскажите, почему вы подходите для этой позиции..."
+              placeholder={t("application.coverLetterPlaceholder")}
               rows={4}
             />
           </div>
 
-          {/* Honeypot field - скрытое поле для ботов */}
           <input
             type="text"
             name="website"
@@ -250,10 +237,10 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
               className="flex-1" 
               disabled={isSubmitting || buttonDisabled || isBlocked}
             >
-              {isSubmitting ? "Отправляется..." : 
-               buttonDisabled ? "Подождите..." :
-               isBlocked ? "Заблокировано" : 
-               "Отправить отклик"}
+              {isSubmitting ? t("application.submitting") : 
+               buttonDisabled ? t("application.wait") :
+               isBlocked ? t("application.blocked") : 
+               t("application.submit")}
             </Button>
             <Button 
               type="button" 
@@ -261,7 +248,7 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Отмена
+              {t("application.cancel")}
             </Button>
           </div>
         </form>

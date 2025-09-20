@@ -9,8 +9,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { useTranslation } from 'react-i18next';
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,6 @@ const Auth = () => {
   const { validatePassword } = usePasswordValidation();
 
   useEffect(() => {
-    // Only redirect logged-in users, not guests
     if (user && profile) {
       navigate('/dashboard');
     }
@@ -35,14 +36,14 @@ const Auth = () => {
     
     if (error) {
       toast({
-        title: "Ошибка входа",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Успешный вход",
-        description: "Вы успешно вошли в систему",
+        title: t("common.success"),
+        description: t("auth.signInSuccess"),
       });
     }
     
@@ -54,7 +55,6 @@ const Auth = () => {
     setLoading(true);
     setPasswordErrors([]);
     
-    // Validate password strength
     const validation = await validatePassword(password);
     if (!validation.valid) {
       setPasswordErrors(validation.errors);
@@ -66,14 +66,14 @@ const Auth = () => {
     
     if (error) {
       toast({
-        title: "Ошибка регистрации",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Регистрация успешна",
-        description: "Проверьте вашу почту для подтверждения аккаунта",
+        title: t("auth.signUpSuccess"),
+        description: t("auth.checkEmail"),
       });
     }
     
@@ -87,7 +87,7 @@ const Auth = () => {
     
     if (error) {
       toast({
-        title: "Ошибка входа через Google",
+        title: t("auth.googleSignInError"),
         description: error.message,
         variant: "destructive",
       });

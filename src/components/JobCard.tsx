@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Building2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface JobCardProps {
   id: string;
@@ -26,6 +27,8 @@ export const JobCard = ({
   postedDate,
   onApply,
 }: JobCardProps) => {
+  const { t } = useTranslation();
+  
   return (
     <Card className="bg-gradient-card shadow-card hover:shadow-hover transition-all duration-300 border-0">
       <CardHeader>
@@ -65,7 +68,7 @@ export const JobCard = ({
           onClick={() => onApply(id)}
           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
         >
-          Откликнуться на вакансию
+          {t("jobCard.apply")}
         </Button>
       </CardContent>
     </Card>

@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileText, Link as LinkIcon, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ApplicationModalProps {
   open: boolean;
@@ -27,6 +28,7 @@ interface Resume {
 }
 
 const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: ApplicationModalProps) => {
+  const { t } = useTranslation();
   const [userResumes, setUserResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(false);
   const [resumeSource, setResumeSource] = useState<'existing' | 'file' | 'link'>('existing');
@@ -95,8 +97,8 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
     if (!isCandidate) {
       if (!formData.guest_name.trim() || !formData.guest_email.trim() || !formData.guest_phone.trim()) {
         toast({
-          title: "Ошибка",
-          description: "Заполните все обязательные поля",
+          title: t("applicationModal.error"),
+          description: t("applicationModal.fillRequired"),
           variant: "destructive",
         });
         return false;
@@ -105,8 +107,8 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
 
     if (resumeSource === 'existing' && !formData.resume_id) {
       toast({
-        title: "Ошибка",
-        description: "Выберите резюме из списка",
+        title: t("applicationModal.error"),
+        description: t("applicationModal.selectResumeError"),
         variant: "destructive",
       });
       return false;
@@ -114,8 +116,8 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
 
     if (resumeSource === 'file' && !selectedFile) {
       toast({
-        title: "Ошибка",
-        description: "Выберите файл резюме",
+        title: t("applicationModal.error"),
+        description: t("applicationModal.selectFileError"),
         variant: "destructive",
       });
       return false;
@@ -123,8 +125,8 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
 
     if (resumeSource === 'link' && !formData.resume_link.trim()) {
       toast({
-        title: "Ошибка",
-        description: "Укажите ссылку на резюме",
+        title: t("applicationModal.error"),
+        description: t("applicationModal.provideLinkError"),
         variant: "destructive",
       });
       return false;
@@ -132,11 +134,10 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
 
     if (resumeSource === 'link') {
       const link = formData.resume_link.trim();
-      // Simple validation - just check if it's not empty and looks like a URL
       if (!link || (!link.startsWith('http') && !link.includes('.'))) {
         toast({
-          title: "Ошибка",
-          description: "Укажите корректную ссылку на резюме",
+          title: t("applicationModal.error"),
+          description: t("applicationModal.invalidLinkError"),
           variant: "destructive",
         });
         return false;
@@ -194,8 +195,8 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
       if (error) {
         if (error.code === '23505') {
           toast({
-            title: "Внимание",
-            description: "Вы уже откликались на эту вакансию",
+            title: t("applicationModal.alreadyApplied"),
+            description: t("applicationModal.alreadyAppliedDesc"),
             variant: "destructive",
           });
         } else {
@@ -203,16 +204,16 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
         }
       } else {
         toast({
-          title: "Успешно",
-          description: "Отклик отправлен",
+          title: t("applicationModal.sent"),
+          description: t("applicationModal.sentDesc"),
         });
         handleClose();
       }
     } catch (error) {
       console.error('Error submitting application:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось отправить отклик",
+        title: t("applicationModal.error"),
+        description: t("applicationModal.sendError"),
         variant: "destructive",
       });
     } finally {
@@ -243,8 +244,8 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
         toast({
-          title: "Ошибка",
-          description: "Размер файла не должен превышать 10MB",
+          title: t("applicationModal.error"),
+          description: t("applicationModal.fileSizeError"),
           variant: "destructive",
         });
         return;
@@ -253,8 +254,8 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
       const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       if (!allowedTypes.includes(file.type)) {
         toast({
-          title: "Ошибка",
-          description: "Поддерживаются только файлы PDF и DOCX",
+          title: t("applicationModal.error"),
+          description: t("applicationModal.fileTypeError"),
           variant: "destructive",
         });
         return;
@@ -268,43 +269,42 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Откликнуться на вакансию</DialogTitle>
+          <DialogTitle>{t("applicationModal.title")}</DialogTitle>
           <p className="text-sm text-muted-foreground">{vacancyTitle}</p>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Guest fields */}
           {!isCandidate && (
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-2 mb-4">
                   <User className="w-4 h-4" />
-                  <h3 className="font-medium">Ваши контактные данные</h3>
+                  <h3 className="font-medium">{t("applicationModal.contactData")}</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="guest_name">Имя *</Label>
+                    <Label htmlFor="guest_name">{t("applicationModal.name")}</Label>
                     <Input
                       id="guest_name"
                       value={formData.guest_name}
                       onChange={(e) => setFormData(prev => ({ ...prev, guest_name: e.target.value }))}
-                      placeholder="Иван Иванов"
+                      placeholder={t("applicationModal.namePlaceholder")}
                       required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="guest_phone">Телефон *</Label>
+                    <Label htmlFor="guest_phone">{t("application.phone")} *</Label>
                     <Input
                       id="guest_phone"
                       type="tel"
                       value={formData.guest_phone}
                       onChange={(e) => setFormData(prev => ({ ...prev, guest_phone: e.target.value }))}
-                      placeholder="+7 (999) 123-45-67"
+                      placeholder={t("applicationModal.phonePlaceholder")}
                       required
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label htmlFor="guest_email">Email *</Label>
+                    <Label htmlFor="guest_email">{t("auth.email")} *</Label>
                     <Input
                       id="guest_email"
                       type="email"
@@ -319,12 +319,11 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
             </Card>
           )}
 
-          {/* Resume selection */}
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-2 mb-4">
                 <FileText className="w-4 h-4" />
-                <h3 className="font-medium">Резюме</h3>
+                <h3 className="font-medium">{t("applicationModal.resume")}</h3>
               </div>
 
               {isCandidate && userResumes.length > 0 && (
@@ -335,15 +334,15 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="existing" id="existing" />
-                    <Label htmlFor="existing">Выбрать из моих резюме</Label>
+                    <Label htmlFor="existing">{t("applicationModal.selectExisting")}</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="file" id="file" />
-                    <Label htmlFor="file">Загрузить файл</Label>
+                    <Label htmlFor="file">{t("applicationModal.uploadFile")}</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="link" id="link" />
-                    <Label htmlFor="link">Указать ссылку</Label>
+                    <Label htmlFor="link">{t("applicationModal.provideLink")}</Label>
                   </div>
                 </RadioGroup>
               )}
@@ -356,27 +355,26 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="file" id="file" />
-                    <Label htmlFor="file">Загрузить файл</Label>
+                    <Label htmlFor="file">{t("applicationModal.uploadFile")}</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="link" id="link" />
-                    <Label htmlFor="link">Указать ссылку</Label>
+                    <Label htmlFor="link">{t("applicationModal.provideLink")}</Label>
                   </div>
                 </RadioGroup>
               )}
 
-              {/* Existing resume selection */}
               {resumeSource === 'existing' && userResumes.length > 0 && (
                 <div>
-                  <Label>Выберите резюме</Label>
+                  <Label>{t("applicationModal.selectResume")}</Label>
                   <Select value={formData.resume_id} onValueChange={(value) => setFormData(prev => ({ ...prev, resume_id: value }))}>
                     <SelectTrigger className="bg-background">
-                      <SelectValue placeholder="Выберите резюме" />
+                      <SelectValue placeholder={t("applicationModal.selectResume")} />
                     </SelectTrigger>
                     <SelectContent className="bg-background border z-50">
                       {userResumes.map((resume) => (
                         <SelectItem key={resume.id} value={resume.id}>
-                          {resume.full_name} (создано {new Date(resume.created_at).toLocaleDateString('ru-RU')})
+                          {resume.full_name} ({t("time.created", { date: new Date(resume.created_at).toLocaleDateString() })})
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -384,10 +382,9 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
                 </div>
               )}
 
-              {/* File upload */}
               {resumeSource === 'file' && (
                 <div>
-                  <Label htmlFor="resume_file">Файл резюме (PDF, DOCX, до 10MB)</Label>
+                  <Label htmlFor="resume_file">{t("applicationModal.resumeFile")}</Label>
                   <div className="mt-2">
                     <Input
                       id="resume_file"
@@ -406,10 +403,9 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
                 </div>
               )}
 
-              {/* Link input */}
               {resumeSource === 'link' && (
                 <div>
-                  <Label htmlFor="resume_link">Ссылка на резюме</Label>
+                  <Label htmlFor="resume_link">{t("applicationModal.resumeLinkLabel")}</Label>
                   <div className="mt-2 flex">
                     <div className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted">
                       <LinkIcon className="w-4 h-4 text-muted-foreground" />
@@ -419,7 +415,7 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
                       type="text"
                       value={formData.resume_link}
                       onChange={(e) => setFormData(prev => ({ ...prev, resume_link: e.target.value }))}
-                      placeholder="example.com/my-resume.pdf"
+                      placeholder={t("applicationModal.resumeLinkPlaceholder")}
                       className="rounded-l-none"
                     />
                   </div>
@@ -428,26 +424,24 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
             </CardContent>
           </Card>
 
-          {/* Message */}
           <div>
-            <Label htmlFor="message">Сопроводительное письмо</Label>
+            <Label htmlFor="message">{t("applicationModal.coverLetterLabel")}</Label>
             <Textarea
               id="message"
               value={formData.message}
               onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-              placeholder="Расскажите о себе и почему вас интересует эта позиция"
+              placeholder={t("applicationModal.coverLetterPlaceholder")}
               rows={4}
               className="mt-2"
             />
           </div>
 
-          {/* Buttons */}
           <div className="flex gap-2 pt-4">
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? 'Отправляем...' : 'Отправить отклик'}
+              {loading ? t("applicationModal.sending") : t("applicationModal.sendApplication")}
             </Button>
             <Button type="button" variant="outline" onClick={handleClose}>
-              Отмена
+              {t("common.cancel")}
             </Button>
           </div>
         </form>
