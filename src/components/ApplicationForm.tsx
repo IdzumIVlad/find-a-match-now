@@ -215,10 +215,10 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
             <Label htmlFor="resume">Ссылка на резюме</Label>
             <Input
               id="resume"
-              type="url"
+              type="text"
               value={formData.resume}
               onChange={(e) => handleInputChange("resume", e.target.value)}
-              placeholder="https://example.com/resume.pdf"
+              placeholder="example.com/resume.pdf или https://example.com/resume.pdf"
             />
           </div>
 

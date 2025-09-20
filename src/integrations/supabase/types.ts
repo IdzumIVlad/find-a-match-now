@@ -17,7 +17,7 @@ export type Database = {
       applications: {
         Row: {
           applied_by: string | null
-          candidate_id: string
+          candidate_id: string | null
           created_at: string
           guest_email: string | null
           guest_name: string | null
@@ -31,7 +31,7 @@ export type Database = {
         }
         Insert: {
           applied_by?: string | null
-          candidate_id: string
+          candidate_id?: string | null
           created_at?: string
           guest_email?: string | null
           guest_name?: string | null
@@ -45,7 +45,7 @@ export type Database = {
         }
         Update: {
           applied_by?: string | null
-          candidate_id?: string
+          candidate_id?: string | null
           created_at?: string
           guest_email?: string | null
           guest_name?: string | null

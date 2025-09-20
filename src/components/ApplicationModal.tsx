@@ -131,9 +131,9 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
     }
 
     if (resumeSource === 'link') {
-      try {
-        new URL(formData.resume_link);
-      } catch {
+      const link = formData.resume_link.trim();
+      // Simple validation - just check if it's not empty and looks like a URL
+      if (!link || (!link.startsWith('http') && !link.includes('.'))) {
         toast({
           title: "Ошибка",
           description: "Укажите корректную ссылку на резюме",
@@ -416,10 +416,10 @@ const ApplicationModal = ({ open, onOpenChange, vacancyId, vacancyTitle }: Appli
                     </div>
                     <Input
                       id="resume_link"
-                      type="url"
+                      type="text"
                       value={formData.resume_link}
                       onChange={(e) => setFormData(prev => ({ ...prev, resume_link: e.target.value }))}
-                      placeholder="https://example.com/my-resume.pdf"
+                      placeholder="example.com/my-resume.pdf"
                       className="rounded-l-none"
                     />
                   </div>
