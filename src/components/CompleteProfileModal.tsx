@@ -60,7 +60,7 @@ const CompleteProfileModal = ({ open, onClose }: CompleteProfileModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" data-testid="complete-profile-modal">
         <DialogHeader>
           <DialogTitle>Завершите профиль</DialogTitle>
         </DialogHeader>
