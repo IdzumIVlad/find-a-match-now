@@ -23,7 +23,7 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]');
     
     // Should show success message
-    await expect(page.locator('.toast')).toContainText('Регистрация успешна');
+    await expect(page.getByText('Регистрация успешна')).toBeVisible();
   });
 
   test('should complete profile and redirect based on role - employer', async ({ page }) => {
@@ -78,7 +78,7 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]');
     
     // Should show validation error
-    await expect(page.locator('.error')).toContainText('Введите корректный номер телефона');
+    await expect(page.getByText('Введите корректный номер телефона')).toBeVisible();
   });
 
   test('should login existing user', async ({ page }) => {

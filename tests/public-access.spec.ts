@@ -15,20 +15,20 @@ test.describe('Public Access', () => {
     await expect(page.locator('h1')).toContainText('Доска объявлений');
     
     // Should see job cards (if any exist)
-    const jobCards = page.locator('.job-card');
+    const jobCards = page.locator('[data-testid="job-card"]');
     
     // Job cards should be visible or show empty state
     if (await jobCards.count() > 0) {
       await expect(jobCards.first()).toBeVisible();
     } else {
-      await expect(page.locator('.empty-state')).toBeVisible();
+      await expect(page.locator('[data-testid="empty-state"]')).toBeVisible();
     }
   });
 
   test('should allow viewing individual job details without login', async ({ page }) => {
     await page.goto('/');
     
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     
     if (await jobCard.isVisible()) {
       await jobCard.click();
@@ -48,12 +48,12 @@ test.describe('Public Access', () => {
     await expect(page.locator('h1')).toContainText('База резюме');
     
     // Should see resume cards (if any exist) or empty state
-    const resumeCards = page.locator('.resume-card');
+    const resumeCards = page.locator('[data-testid="resume-card"]');
     
     if (await resumeCards.count() > 0) {
       await expect(resumeCards.first()).toBeVisible();
     } else {
-      await expect(page.locator('.empty-state')).toBeVisible();
+      await expect(page.locator('[data-testid="empty-state"]')).toBeVisible();
     }
   });
 
@@ -100,7 +100,7 @@ test.describe('Public Access', () => {
   test('should not show employer contact info on public job pages', async ({ page }) => {
     await page.goto('/');
     
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     
     if (await jobCard.isVisible()) {
       await jobCard.click();
@@ -118,7 +118,7 @@ test.describe('Public Access', () => {
   test('should not show candidate contact info on public resume pages', async ({ page }) => {
     await page.goto('/resumes');
     
-    const resumeCard = page.locator('.resume-card').first();
+    const resumeCard = page.locator('[data-testid="resume-card"]').first();
     
     if (await resumeCard.isVisible()) {
       await resumeCard.click();

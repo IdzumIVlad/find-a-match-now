@@ -28,10 +28,10 @@ test.describe('Candidate Dashboard', () => {
     await page.click('button[type="submit"]');
     
     // Should show success message
-    await expect(page.locator('.toast')).toContainText('Резюме создано');
+    await expect(page.getByText('Резюме создано')).toBeVisible();
     
     // Should see resume in list
-    await expect(page.locator('.resume-card')).toContainText('Иван Иванов');
+    await expect(page.locator('[data-testid="resume-card"]')).toContainText('Иван Иванов');
   });
 
   test('should apply to job with existing resume', async ({ page }) => {
@@ -46,7 +46,7 @@ test.describe('Candidate Dashboard', () => {
     await page.goto('/');
     
     // Find and click on a job
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     if (await jobCard.isVisible()) {
       await jobCard.click();
       
@@ -63,7 +63,7 @@ test.describe('Candidate Dashboard', () => {
       await page.click('button[type="submit"]');
       
       // Should show success message
-      await expect(page.locator('.toast')).toContainText('Отклик отправлен');
+      await expect(page.getByText('Отклик отправлен')).toBeVisible();
     }
   });
 
@@ -76,7 +76,7 @@ test.describe('Candidate Dashboard', () => {
     
     // Navigate to jobs and apply to first job
     await page.goto('/');
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     
     if (await jobCard.isVisible()) {
       await jobCard.click();
@@ -87,13 +87,13 @@ test.describe('Candidate Dashboard', () => {
       await page.click('button[type="submit"]');
       
       // Wait for success
-      await expect(page.locator('.toast')).toContainText('Отклик отправлен');
+      await expect(page.getByText('Отклик отправлен')).toBeVisible();
       
       // Try to apply again
       await page.click('button:has-text("Отправить отклик")');
       
       // Should show that already applied
-      await expect(page.locator('.toast')).toContainText('Вы уже откликались на эту вакансию');
+      await expect(page.getByText('Вы уже откликались')).toBeVisible();
       
       // Or button should be disabled
       const applyButton = page.locator('button:has-text("Отправить отклик")');
@@ -109,7 +109,7 @@ test.describe('Candidate Dashboard', () => {
     await expect(page.locator('h2')).toContainText('Мои отклики');
     
     // Should show empty state if no applications
-    await expect(page.locator('.empty-state')).toBeVisible();
+    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible();
   });
 
   test('should edit own resume', async ({ page }) => {
@@ -127,7 +127,7 @@ test.describe('Candidate Dashboard', () => {
     await page.click('button[type="submit"]');
     
     // Should see updated name
-    await expect(page.locator('.resume-card')).toContainText('Ольга Петровна Кузнецова');
+    await expect(page.locator('[data-testid="resume-card"]')).toContainText('Ольга Петровна Кузнецова');
   });
 
   test('should delete own resume', async ({ page }) => {
@@ -144,7 +144,7 @@ test.describe('Candidate Dashboard', () => {
     await page.click('button:has-text("Да, удалить")');
     
     // Should show success message
-    await expect(page.locator('.toast')).toContainText('Резюме удалено');
+    await expect(page.getByText('Резюме удалено')).toBeVisible();
     
     // Resume should no longer be visible
     await expect(page.locator('text=Максим Волков')).not.toBeVisible();

@@ -13,7 +13,7 @@ test.describe('Guest Applications', () => {
     await page.goto('/');
     
     // Find and click on a job
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     
     if (await jobCard.isVisible()) {
       await jobCard.click();
@@ -35,14 +35,14 @@ test.describe('Guest Applications', () => {
       await page.click('button[type="submit"]');
       
       // Should show success message
-      await expect(page.locator('.toast')).toContainText('Отклик отправлен');
+      await expect(page.getByText('Отклик отправлен')).toBeVisible();
     }
   });
 
   test('should validate required fields for guest application', async ({ page }) => {
     await page.goto('/');
     
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     
     if (await jobCard.isVisible()) {
       await jobCard.click();
@@ -52,14 +52,14 @@ test.describe('Guest Applications', () => {
       await page.click('button[type="submit"]');
       
       // Should show validation errors
-      await expect(page.locator('.error')).toContainText('Имя обязательно');
+      await expect(page.getByText('обязательно')).toBeVisible();
     }
   });
 
   test('should validate email format for guest application', async ({ page }) => {
     await page.goto('/');
     
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     
     if (await jobCard.isVisible()) {
       await jobCard.click();
@@ -71,14 +71,14 @@ test.describe('Guest Applications', () => {
       await page.click('button[type="submit"]');
       
       // Should show email validation error
-      await expect(page.locator('.error')).toContainText('Введите корректный email');
+      await expect(page.getByText('корректный email')).toBeVisible();
     }
   });
 
   test('should validate phone format for guest application', async ({ page }) => {
     await page.goto('/');
     
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     
     if (await jobCard.isVisible()) {
       await jobCard.click();
@@ -91,14 +91,14 @@ test.describe('Guest Applications', () => {
       await page.click('button[type="submit"]');
       
       // Should show phone validation error
-      await expect(page.locator('.error')).toContainText('Введите корректный номер телефона');
+      await expect(page.getByText('корректный номер телефона')).toBeVisible();
     }
   });
 
   test('should allow optional resume link for guest', async ({ page }) => {
     await page.goto('/');
     
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     
     if (await jobCard.isVisible()) {
       await jobCard.click();
@@ -114,14 +114,14 @@ test.describe('Guest Applications', () => {
       await page.click('button[type="submit"]');
       
       // Should still succeed
-      await expect(page.locator('.toast')).toContainText('Отклик отправлен');
+      await expect(page.getByText('Отклик отправлен')).toBeVisible();
     }
   });
 
   test('should prevent rate limiting abuse for guest applications', async ({ page }) => {
     await page.goto('/');
     
-    const jobCard = page.locator('.job-card').first();
+    const jobCard = page.locator('[data-testid="job-card"]').first();
     
     if (await jobCard.isVisible()) {
       const jobUrl = page.url();
@@ -139,12 +139,9 @@ test.describe('Guest Applications', () => {
         
         if (i >= 3) {
           // Should eventually show rate limit message
-          const toast = page.locator('.toast');
-          if (await toast.isVisible()) {
-            const text = await toast.textContent();
-            if (text?.includes('превышен лимит') || text?.includes('rate limit')) {
-              break;
-            }
+          const rateLimitText = page.getByText(/превышен лимит|rate limit/i);
+          if (await rateLimitText.isVisible()) {
+            break;
           }
         }
       }

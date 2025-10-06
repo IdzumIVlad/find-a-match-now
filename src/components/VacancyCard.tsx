@@ -42,7 +42,7 @@ const VacancyCard = ({
   };
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow">
+    <Card className="h-full hover:shadow-lg transition-shadow" data-testid="vacancy-card">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="flex-1">

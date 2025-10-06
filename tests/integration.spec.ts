@@ -47,17 +47,17 @@ test.describe('Integration Tests', () => {
     await candidatePage.fill('textarea[placeholder*="Сопроводительное письмо"]', 'Очень заинтересован в позиции');
     await candidatePage.click('button[type="submit"]');
     
-    await expect(candidatePage.locator('.toast')).toContainText('Отклик отправлен');
+    await expect(candidatePage.getByText('Отклик отправлен')).toBeVisible();
     
     // 5. Employer sees application
     await page.click('text=Отклики');
-    await expect(page.locator('.application-card')).toContainText('Александр Разработчиков');
+    await expect(page.locator('[data-testid="application-card"]')).toContainText('Александр Разработчиков');
     
     // 6. Guest also applies to same job
     const guestPage = await context.newPage();
     await guestPage.goto('/');
     
-    const guestJobCard = guestPage.locator('.job-card:has-text("Full Stack Developer")');
+    const guestJobCard = guestPage.locator('[data-testid="job-card"]:has-text("Full Stack Developer")');
     await guestJobCard.click();
     
     await guestPage.click('button:has-text("Отправить отклик")');
@@ -67,11 +67,11 @@ test.describe('Integration Tests', () => {
     await guestPage.fill('textarea[placeholder*="Сопроводительное письмо"]', 'Готов обсудить возможности');
     await guestPage.click('button[type="submit"]');
     
-    await expect(guestPage.locator('.toast')).toContainText('Отклик отправлен');
+    await expect(guestPage.getByText('Отклик отправлен')).toBeVisible();
     
     // 7. Employer sees both applications
     await page.reload();
-    const applications = page.locator('.application-card');
+    const applications = page.locator('[data-testid="application-card"]');
     await expect(applications).toHaveCount(2);
     
     await candidatePage.close();
@@ -111,13 +111,13 @@ test.describe('Integration Tests', () => {
     await employer2Page.click('button[type="submit"]');
     
     // Each employer should only see their own vacancies
-    await expect(page.locator('.vacancy-card')).toHaveCount(1);
-    await expect(page.locator('.vacancy-card')).toContainText('Backend Developer');
-    await expect(page.locator('.vacancy-card')).not.toContainText('Frontend Developer');
+    await expect(page.locator('[data-testid="vacancy-card"]')).toHaveCount(1);
+    await expect(page.locator('[data-testid="vacancy-card"]')).toContainText('Backend Developer');
+    await expect(page.locator('[data-testid="vacancy-card"]')).not.toContainText('Frontend Developer');
     
-    await expect(employer2Page.locator('.vacancy-card')).toHaveCount(1);
-    await expect(employer2Page.locator('.vacancy-card')).toContainText('Frontend Developer');
-    await expect(employer2Page.locator('.vacancy-card')).not.toContainText('Backend Developer');
+    await expect(employer2Page.locator('[data-testid="vacancy-card"]')).toHaveCount(1);
+    await expect(employer2Page.locator('[data-testid="vacancy-card"]')).toContainText('Frontend Developer');
+    await expect(employer2Page.locator('[data-testid="vacancy-card"]')).not.toContainText('Backend Developer');
     
     await employer2Page.close();
   });
@@ -164,7 +164,7 @@ test.describe('Integration Tests', () => {
       
       // Apply to job
       await candidate.page.goto('/');
-      const jobCard = candidate.page.locator('.job-card:has-text("DevOps Engineer")');
+      const jobCard = candidate.page.locator('[data-testid="job-card"]:has-text("DevOps Engineer")');
       await jobCard.click();
       
       await candidate.page.click('button:has-text("Отправить отклик")');
@@ -184,7 +184,7 @@ test.describe('Integration Tests', () => {
     
     // Employer should see all 3 applications
     await page.click('text=Отклики');
-    await expect(page.locator('.application-card')).toHaveCount(3);
+    await expect(page.locator('[data-testid="application-card"]')).toHaveCount(3);
     
     // Cleanup
     for (const candidate of candidates) {

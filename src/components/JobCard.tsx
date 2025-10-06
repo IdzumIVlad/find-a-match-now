@@ -30,7 +30,7 @@ export const JobCard = ({
   const { t } = useTranslation();
   
   return (
-    <Card className="bg-gradient-card shadow-card hover:shadow-hover transition-all duration-300 border-0">
+    <Card className="bg-gradient-card shadow-card hover:shadow-hover transition-all duration-300 border-0" data-testid="job-card">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="space-y-2">

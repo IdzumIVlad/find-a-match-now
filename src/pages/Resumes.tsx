@@ -154,7 +154,7 @@ const Resumes = () => {
 
         {!hasAccess ? (
           <div className="max-w-2xl mx-auto text-center">
-            <Card className="p-8">
+            <Card className="p-8" data-testid="access-required">
               <div className="flex flex-col items-center space-y-6">
                 <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
                   <Lock className="w-8 h-8 text-muted-foreground" />
@@ -249,7 +249,7 @@ const Resumes = () => {
             {/* Resume Cards */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredResumes.map((resume) => (
-                <Card key={resume.id} className="h-full hover:shadow-lg transition-shadow">
+                <Card key={resume.id} className="h-full hover:shadow-lg transition-shadow" data-testid="resume-card">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
@@ -304,7 +304,7 @@ const Resumes = () => {
             </div>
 
             {filteredResumes.length === 0 && (
-              <div className="text-center py-12">
+              <div className="text-center py-12" data-testid="empty-state">
                 <p className="text-muted-foreground text-lg">
                   {searchTerm || skillFilter 
                     ? 'Резюме по заданным критериям не найдены'

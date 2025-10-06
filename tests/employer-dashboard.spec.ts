@@ -30,10 +30,10 @@ test.describe('Employer Dashboard', () => {
     await page.click('button[type="submit"]');
     
     // Should show success message
-    await expect(page.locator('.toast')).toContainText('Вакансия создана');
+    await expect(page.getByText('Вакансия создана')).toBeVisible();
     
     // Should see vacancy in list
-    await expect(page.locator('.vacancy-card')).toContainText('Frontend Developer');
+    await expect(page.locator('[data-testid="vacancy-card"]')).toContainText('Frontend Developer');
   });
 
   test('should view applications to own vacancies', async ({ page }) => {
@@ -51,7 +51,7 @@ test.describe('Employer Dashboard', () => {
     await expect(page.locator('h2')).toContainText('Отклики на ваши вакансии');
     
     // If no applications, should show empty state
-    await expect(page.locator('.empty-state')).toBeVisible();
+    await expect(page.locator('[data-testid="empty-state"]')).toBeVisible();
   });
 
   test('should not see other employers vacancies or applications', async ({ page }) => {
@@ -81,7 +81,7 @@ test.describe('Employer Dashboard', () => {
     await page.click('button[type="submit"]');
     
     // Should see updated title
-    await expect(page.locator('.vacancy-card')).toContainText('Senior QA Engineer');
+    await expect(page.locator('[data-testid="vacancy-card"]')).toContainText('Senior QA Engineer');
   });
 
   test('should delete own vacancy', async ({ page }) => {
@@ -98,7 +98,7 @@ test.describe('Employer Dashboard', () => {
     await page.click('button:has-text("Да, удалить")');
     
     // Should show success message
-    await expect(page.locator('.toast')).toContainText('Вакансия удалена');
+    await expect(page.getByText('Вакансия удалена')).toBeVisible();
     
     // Vacancy should no longer be visible
     await expect(page.locator('text=DevOps Engineer')).not.toBeVisible();

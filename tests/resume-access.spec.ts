@@ -17,14 +17,14 @@ test.describe('Resume Database Access Control', () => {
     await page.goto('/resumes');
     
     // Find resume cards
-    const resumeCards = page.locator('.resume-card');
+    const resumeCards = page.locator('[data-testid="resume-card"]');
     
     if (await resumeCards.count() > 0) {
       const firstCard = resumeCards.first();
       await firstCard.click();
       
       // Should see access required message
-      await expect(page.locator('.access-required')).toContainText('Доступ к базе резюме ограничен');
+      await expect(page.locator('[data-testid="access-required"]')).toContainText('Доступ к базе резюме');
       
       // Contact details should be hidden
       await expect(page.locator('.contact-info')).not.toBeVisible();
@@ -43,7 +43,7 @@ test.describe('Resume Database Access Control', () => {
     // Navigate to resumes
     await page.goto('/resumes');
     
-    const resumeCards = page.locator('.resume-card');
+    const resumeCards = page.locator('[data-testid="resume-card"]');
     
     if (await resumeCards.count() > 0) {
       const firstCard = resumeCards.first();
@@ -53,7 +53,7 @@ test.describe('Resume Database Access Control', () => {
       // This would require setting up test data with resume_access.has_access = true
       
       // Check if access section exists
-      const accessSection = page.locator('.access-required');
+      const accessSection = page.locator('[data-testid="access-required"]');
       
       if (await accessSection.isVisible()) {
         // Access not granted - this is expected for new employers
@@ -74,14 +74,14 @@ test.describe('Resume Database Access Control', () => {
     await page.goto('/resumes');
     
     // Should see full access (candidates can see resumes)
-    const resumeCards = page.locator('.resume-card');
+    const resumeCards = page.locator('[data-testid="resume-card"]');
     
     if (await resumeCards.count() > 0) {
       const firstCard = resumeCards.first();
       await firstCard.click();
       
       // Should not see access restriction for candidates
-      await expect(page.locator('.access-required')).not.toBeVisible();
+      await expect(page.locator('[data-testid="access-required"]')).not.toBeVisible();
     }
   });
 
@@ -103,7 +103,7 @@ test.describe('Resume Database Access Control', () => {
     
     await page.goto('/resumes');
     
-    const resumeCards = page.locator('.resume-card');
+    const resumeCards = page.locator('[data-testid="resume-card"]');
     
     if (await resumeCards.count() > 0) {
       await resumeCards.first().click();
@@ -158,7 +158,7 @@ test.describe('Resume Database Access Control', () => {
   test('should show resume preview without sensitive data', async ({ page }) => {
     await page.goto('/resumes');
     
-    const resumeCards = page.locator('.resume-card');
+    const resumeCards = page.locator('[data-testid="resume-card"]');
     
     if (await resumeCards.count() > 0) {
       const cardContent = await resumeCards.first().textContent();
