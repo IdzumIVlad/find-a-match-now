@@ -395,9 +395,10 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
-          employer_id: string
+          employer_id: string | null
           employment_type: string | null
           id: string
+          is_demo: boolean | null
           location: string | null
           salary_max: number | null
           salary_min: number | null
@@ -407,9 +408,10 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
-          employer_id: string
+          employer_id?: string | null
           employment_type?: string | null
           id?: string
+          is_demo?: boolean | null
           location?: string | null
           salary_max?: number | null
           salary_min?: number | null
@@ -419,9 +421,10 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
-          employer_id?: string
+          employer_id?: string | null
           employment_type?: string | null
           id?: string
+          is_demo?: boolean | null
           location?: string | null
           salary_max?: number | null
           salary_min?: number | null
