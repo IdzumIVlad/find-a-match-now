@@ -23,11 +23,12 @@ export type Database = {
           guest_name: string | null
           guest_phone: string | null
           id: string
+          job_id: string | null
           message: string | null
           resume_file_url: string | null
           resume_id: string | null
           resume_link: string | null
-          vacancy_id: string
+          status: string | null
         }
         Insert: {
           applied_by?: string | null
@@ -37,11 +38,12 @@ export type Database = {
           guest_name?: string | null
           guest_phone?: string | null
           id?: string
+          job_id?: string | null
           message?: string | null
           resume_file_url?: string | null
           resume_id?: string | null
           resume_link?: string | null
-          vacancy_id: string
+          status?: string | null
         }
         Update: {
           applied_by?: string | null
@@ -51,11 +53,12 @@ export type Database = {
           guest_name?: string | null
           guest_phone?: string | null
           id?: string
+          job_id?: string | null
           message?: string | null
           resume_file_url?: string | null
           resume_id?: string | null
           resume_link?: string | null
-          vacancy_id?: string
+          status?: string | null
         }
         Relationships: [
           {
@@ -63,6 +66,13 @@ export type Database = {
             columns: ["candidate_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
             referencedColumns: ["id"]
           },
           {
@@ -77,13 +87,6 @@ export type Database = {
             columns: ["resume_id"]
             isOneToOne: false
             referencedRelation: "resumes_public_safe"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_vacancy_id_fkey"
-            columns: ["vacancy_id"]
-            isOneToOne: false
-            referencedRelation: "vacancies"
             referencedColumns: ["id"]
           },
         ]
@@ -122,6 +125,47 @@ export type Database = {
             columns: ["vacancy_id"]
             isOneToOne: false
             referencedRelation: "vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      companies: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          owner_id: string
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companies_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -179,45 +223,59 @@ export type Database = {
       }
       jobs: {
         Row: {
-          company_name: string
-          created_at: string
+          company_id: string
+          created_at: string | null
           description: string | null
-          employer_email: string
           employment_type: string | null
           id: string
+          is_remote: boolean | null
           location: string | null
           requirements: string | null
-          salary: string | null
+          salary_max: number | null
+          salary_min: number | null
+          status: string
           title: string
-          updated_at: string
+          updated_at: string | null
         }
         Insert: {
-          company_name: string
-          created_at?: string
+          company_id: string
+          created_at?: string | null
           description?: string | null
-          employer_email: string
           employment_type?: string | null
           id?: string
+          is_remote?: boolean | null
           location?: string | null
           requirements?: string | null
-          salary?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
           title: string
-          updated_at?: string
+          updated_at?: string | null
         }
         Update: {
-          company_name?: string
-          created_at?: string
+          company_id?: string
+          created_at?: string | null
           description?: string | null
-          employer_email?: string
           employment_type?: string | null
           id?: string
+          is_remote?: boolean | null
           location?: string | null
           requirements?: string | null
-          salary?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
           title?: string
-          updated_at?: string
+          updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "jobs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       outbox_webhooks: {
         Row: {
@@ -391,6 +449,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       vacancies: {
         Row: {
           created_at: string
@@ -443,252 +522,6 @@ export type Database = {
       }
     }
     Views: {
-      applications_employer_safe: {
-        Row: {
-          applicant_name: string | null
-          applied_by: string | null
-          candidate_id: string | null
-          contact_email: string | null
-          created_at: string | null
-          id: string | null
-          message: string | null
-          resume_file_url: string | null
-          resume_id: string | null
-          resume_link: string | null
-          vacancy_id: string | null
-        }
-        Insert: {
-          applicant_name?: never
-          applied_by?: string | null
-          candidate_id?: string | null
-          contact_email?: never
-          created_at?: string | null
-          id?: string | null
-          message?: string | null
-          resume_file_url?: string | null
-          resume_id?: string | null
-          resume_link?: string | null
-          vacancy_id?: string | null
-        }
-        Update: {
-          applicant_name?: never
-          applied_by?: string | null
-          candidate_id?: string | null
-          contact_email?: never
-          created_at?: string | null
-          id?: string | null
-          message?: string | null
-          resume_file_url?: string | null
-          resume_id?: string | null
-          resume_link?: string | null
-          vacancy_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "applications_candidate_id_fkey"
-            columns: ["candidate_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_resume_id_fkey"
-            columns: ["resume_id"]
-            isOneToOne: false
-            referencedRelation: "resumes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_resume_id_fkey"
-            columns: ["resume_id"]
-            isOneToOne: false
-            referencedRelation: "resumes_public_safe"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_vacancy_id_fkey"
-            columns: ["vacancy_id"]
-            isOneToOne: false
-            referencedRelation: "vacancies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      applications_for_candidates: {
-        Row: {
-          applied_by: string | null
-          candidate_id: string | null
-          created_at: string | null
-          id: string | null
-          message: string | null
-          resume_file_url: string | null
-          resume_id: string | null
-          resume_link: string | null
-          vacancy_id: string | null
-        }
-        Insert: {
-          applied_by?: string | null
-          candidate_id?: string | null
-          created_at?: string | null
-          id?: string | null
-          message?: string | null
-          resume_file_url?: string | null
-          resume_id?: string | null
-          resume_link?: string | null
-          vacancy_id?: string | null
-        }
-        Update: {
-          applied_by?: string | null
-          candidate_id?: string | null
-          created_at?: string | null
-          id?: string | null
-          message?: string | null
-          resume_file_url?: string | null
-          resume_id?: string | null
-          resume_link?: string | null
-          vacancy_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "applications_candidate_id_fkey"
-            columns: ["candidate_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_resume_id_fkey"
-            columns: ["resume_id"]
-            isOneToOne: false
-            referencedRelation: "resumes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_resume_id_fkey"
-            columns: ["resume_id"]
-            isOneToOne: false
-            referencedRelation: "resumes_public_safe"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_vacancy_id_fkey"
-            columns: ["vacancy_id"]
-            isOneToOne: false
-            referencedRelation: "vacancies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      applications_for_employers: {
-        Row: {
-          applicant_display_name: string | null
-          applied_by: string | null
-          candidate_id: string | null
-          contact_email: string | null
-          created_at: string | null
-          id: string | null
-          message: string | null
-          resume_file_url: string | null
-          resume_id: string | null
-          resume_link: string | null
-          vacancy_id: string | null
-        }
-        Insert: {
-          applicant_display_name?: never
-          applied_by?: string | null
-          candidate_id?: string | null
-          contact_email?: never
-          created_at?: string | null
-          id?: string | null
-          message?: string | null
-          resume_file_url?: string | null
-          resume_id?: string | null
-          resume_link?: string | null
-          vacancy_id?: string | null
-        }
-        Update: {
-          applicant_display_name?: never
-          applied_by?: string | null
-          candidate_id?: string | null
-          contact_email?: never
-          created_at?: string | null
-          id?: string | null
-          message?: string | null
-          resume_file_url?: string | null
-          resume_id?: string | null
-          resume_link?: string | null
-          vacancy_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "applications_candidate_id_fkey"
-            columns: ["candidate_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_resume_id_fkey"
-            columns: ["resume_id"]
-            isOneToOne: false
-            referencedRelation: "resumes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_resume_id_fkey"
-            columns: ["resume_id"]
-            isOneToOne: false
-            referencedRelation: "resumes_public_safe"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_vacancy_id_fkey"
-            columns: ["vacancy_id"]
-            isOneToOne: false
-            referencedRelation: "vacancies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      jobs_public: {
-        Row: {
-          company_name: string | null
-          created_at: string | null
-          description: string | null
-          employment_type: string | null
-          id: string | null
-          location: string | null
-          requirements: string | null
-          salary: string | null
-          title: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          company_name?: string | null
-          created_at?: string | null
-          description?: string | null
-          employment_type?: string | null
-          id?: string | null
-          location?: string | null
-          requirements?: string | null
-          salary?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          company_name?: string | null
-          created_at?: string | null
-          description?: string | null
-          employment_type?: string | null
-          id?: string | null
-          location?: string | null
-          requirements?: string | null
-          salary?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       resumes_public_safe: {
         Row: {
           created_at: string | null
@@ -794,6 +627,17 @@ export type Database = {
           views: number
         }[]
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       log_security_event: {
         Args: {
           action_name: string
@@ -810,6 +654,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "candidate" | "employer" | "admin"
       user_role: "employer" | "candidate"
     }
     CompositeTypes: {
@@ -938,6 +783,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["candidate", "employer", "admin"],
       user_role: ["employer", "candidate"],
     },
   },
