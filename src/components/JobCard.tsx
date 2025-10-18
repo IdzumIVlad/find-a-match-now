@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 interface JobCardProps {
   id: string;
   title: string;
-  company: string;
+  companyName: string;
   location: string;
   salary: string;
   type: string;
@@ -16,10 +16,10 @@ interface JobCardProps {
   onApply: (jobId: string) => void;
 }
 
-export const JobCard = ({
+const JobCard = ({
   id,
   title,
-  company,
+  companyName,
   location,
   salary,
   type,
@@ -40,7 +40,7 @@ export const JobCard = ({
             <div className="flex items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-1">
                 <Building2 className="w-4 h-4" />
-                {company}
+                {companyName}
               </div>
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
@@ -61,7 +61,7 @@ export const JobCard = ({
         </div>
       </CardHeader>
       <CardContent>
-        <CardDescription className="text-base mb-4 leading-relaxed">
+        <CardDescription className="text-base mb-4 leading-relaxed line-clamp-3">
           {description}
         </CardDescription>
         <Button 
@@ -74,3 +74,5 @@ export const JobCard = ({
     </Card>
   );
 };
+
+export default JobCard;

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import VacancyCard from "@/components/VacancyCard";
-import VacancyForm from "@/components/VacancyForm";
+import JobCard from "@/components/JobCard";
+import JobForm from "@/components/JobForm";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
@@ -16,17 +16,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from 'react-i18next';
 
 const Index = () => {
-  const [vacancies, setVacancies] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showVacancyForm, setShowVacancyForm] = useState(false);
+  const [showJobForm, setShowJobForm] = useState(false);
   const [showCompleteProfile, setShowCompleteProfile] = useState(false);
   const { toast } = useToast();
   const { user, profile, loading: authLoading, fetchProfile } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  // Check if user needs to complete profile
   useEffect(() => {
     if (!authLoading) {
       if (user && !profile) {
@@ -37,21 +36,28 @@ const Index = () => {
     }
   }, [user, profile, authLoading]);
 
-  // Загрузка вакансий из Supabase (только публичные поля)
-  const fetchVacancies = async () => {
+  const fetchJobs = async () => {
     try {
       const { data, error } = await supabase
-        .from('vacancies')
-        .select('id, title, description, location, salary_min, salary_max, employment_type, views, created_at')
+        .from('jobs')
+        .select(`
+          *,
+          companies (
+            id,
+            name,
+            logo_url
+          )
+        `)
+        .eq('status', 'published')
         .order('created_at', { ascending: false });
 
       if (error) {
         throw error;
       }
 
-      setVacancies(data || []);
+      setJobs(data || []);
     } catch (error) {
-      console.error('Error fetching vacancies:', error);
+      console.error('Error fetching jobs:', error);
       toast({
         title: t('common.error'),
         description: "Не удалось загрузить вакансии",
@@ -63,20 +69,21 @@ const Index = () => {
   };
 
   useEffect(() => {
-    fetchVacancies();
+    fetchJobs();
   }, []);
 
-  const filteredVacancies = vacancies.filter(vacancy =>
-    vacancy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (vacancy.location && vacancy.location.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredJobs = jobs.filter(job =>
+    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (job.companies?.name && job.companies.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleAddJob = () => {
-    fetchVacancies(); // Перезагружаем вакансии после добавления
+    fetchJobs();
   };
 
-  const handleApply = (vacancyId: string) => {
-    navigate(`/vacancies/${vacancyId}`);
+  const handleApply = (jobId: string) => {
+    navigate(`/jobs/${jobId}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -91,6 +98,14 @@ const Index = () => {
     return date.toLocaleDateString("ru-RU");
   };
 
+  const formatSalary = (min?: number, max?: number) => {
+    if (!min && !max) return t('vacancy.salaryNegotiable');
+    if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()} ₽`;
+    if (min) return `${t('vacancy.salaryFrom')} ${min.toLocaleString()} ₽`;
+    if (max) return `${t('vacancy.salaryTo')} ${max.toLocaleString()} ₽`;
+    return t('vacancy.salaryNegotiable');
+  };
+
   return (
     <HelmetProvider>
       <div className="min-h-screen bg-background">
@@ -101,7 +116,6 @@ const Index = () => {
         />
         <Header />
       
-      {/* Hero Section */}
       <section className="bg-gradient-hero text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-6">
@@ -122,7 +136,7 @@ const Index = () => {
               />
             </div>
             <Button 
-              onClick={() => setShowVacancyForm(true)}
+              onClick={() => setShowJobForm(true)}
               className="bg-accent hover:bg-accent/90 text-accent-foreground"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -158,14 +172,13 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Jobs Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold">
               {t('home.activeJobs')}
               <span className="text-muted-foreground text-lg ml-2">
-                ({filteredVacancies.length})
+                ({filteredJobs.length})
               </span>
             </h2>
           </div>
@@ -176,30 +189,29 @@ const Index = () => {
                 {t('home.loadingJobs')}
               </div>
             </div>
-          ) : filteredVacancies.length === 0 ? (
+          ) : filteredJobs.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-muted-foreground text-lg mb-4">
                 {searchTerm ? t('home.noJobsFound') : t('home.noJobs')}
               </div>
-              <Button onClick={() => setShowVacancyForm(true)} variant="outline">
+              <Button onClick={() => setShowJobForm(true)} variant="outline">
                 <Plus className="w-4 h-4 mr-2" />
                 {t('home.postFirstJob')}
               </Button>
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              {filteredVacancies.map((vacancy) => (
-                <VacancyCard
-                  key={vacancy.id}
-                  id={vacancy.id}
-                  title={vacancy.title}
-                  location={vacancy.location}
-                  salary_min={vacancy.salary_min}
-                  salary_max={vacancy.salary_max}
-                  employment_type={vacancy.employment_type}
-                  description={vacancy.description}
-                  views={vacancy.views}
-                  postedDate={formatDate(vacancy.created_at)}
+              {filteredJobs.map((job) => (
+                <JobCard
+                  key={job.id}
+                  id={job.id}
+                  title={job.title}
+                  companyName={job.companies?.name || 'Компания'}
+                  location={job.location}
+                  salary={formatSalary(job.salary_min, job.salary_max)}
+                  type={job.employment_type}
+                  description={job.description}
+                  postedDate={formatDate(job.created_at)}
                   onApply={handleApply}
                 />
               ))}
@@ -210,10 +222,9 @@ const Index = () => {
 
       <Footer />
 
-      {/* Modals */}
-      <VacancyForm
-        open={showVacancyForm}
-        onOpenChange={setShowVacancyForm}
+      <JobForm
+        open={showJobForm}
+        onOpenChange={setShowJobForm}
         onSubmit={handleAddJob}
       />
 

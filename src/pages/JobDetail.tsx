@@ -15,14 +15,17 @@ import { format } from 'date-fns';
 interface Job {
   id: string;
   title: string;
-  company_name: string;
   location: string;
-  salary: string;
   employment_type: string;
   description: string;
   requirements: string;
+  salary_min: number;
+  salary_max: number;
   created_at: string;
-  updated_at: string;
+  companies: {
+    name: string;
+    logo_url?: string;
+  };
 }
 
 const JobDetail = () => {
@@ -41,10 +44,17 @@ const JobDetail = () => {
 
       try {
         const { data, error } = await supabase
-          .from('jobs_public')
-          .select('*')
+          .from('jobs')
+          .select(`
+            *,
+            companies (
+              name,
+              logo_url
+            )
+          `)
           .eq('id', id)
-          .single();
+          .eq('status', 'published')
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching job:', error);
@@ -53,7 +63,13 @@ const JobDetail = () => {
           return;
         }
 
-        setJob(data);
+        if (!data) {
+          toast.error('Вакансия не найдена');
+          navigate('/');
+          return;
+        }
+
+        setJob(data as Job);
       } catch (error) {
         console.error('Error:', error);
         toast.error('Ошибка при загрузке вакансии');
@@ -65,6 +81,14 @@ const JobDetail = () => {
 
     fetchJob();
   }, [id, navigate]);
+
+  const formatSalary = (min?: number, max?: number) => {
+    if (!min && !max) return 'По договоренности';
+    if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()} ₽`;
+    if (min) return `от ${min.toLocaleString()} ₽`;
+    if (max) return `до ${max.toLocaleString()} ₽`;
+    return 'По договоренности';
+  };
 
   if (loading) {
     return (
@@ -108,8 +132,8 @@ const JobDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
-        title={`${job.title} в ${job.company_name} | Работа`}
-        description={`${job.title} в компании ${job.company_name}. ${job.location ? `Локация: ${job.location}. ` : ''}${job.salary ? `Зарплата: ${job.salary}. ` : ''}Подать заявку онлайн.`}
+        title={`${job.title} в ${job.companies?.name || 'компании'} | Работа`}
+        description={`${job.title} в компании ${job.companies?.name || ''}. ${job.location ? `Локация: ${job.location}. ` : ''}${formatSalary(job.salary_min, job.salary_max)}. Подать заявку онлайн.`}
       />
       
       <Header />
@@ -136,7 +160,7 @@ const JobDetail = () => {
                   
                   <CardDescription className="text-lg flex items-center gap-2 mb-4">
                     <Building className="h-5 w-5" />
-                    {job.company_name}
+                    {job.companies?.name || 'Компания'}
                   </CardDescription>
 
                   <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
@@ -147,12 +171,10 @@ const JobDetail = () => {
                       </div>
                     )}
                     
-                    {job.salary && (
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
-                        {job.salary}
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1">
+                      <DollarSign className="h-4 w-4" />
+                      {formatSalary(job.salary_min, job.salary_max)}
+                    </div>
                     
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
@@ -233,7 +255,7 @@ const JobDetail = () => {
         onOpenChange={setApplicationFormOpen}
         jobId={job.id}
         jobTitle={job.title}
-        companyName={job.company_name}
+        companyName={job.companies?.name || 'Компания'}
       />
     </div>
   );

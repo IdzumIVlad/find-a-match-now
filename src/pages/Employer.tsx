@@ -17,22 +17,27 @@ import {
   AlertDialogTrigger 
 } from '@/components/ui/alert-dialog';
 import Header from '@/components/Header';
-import VacancyForm from '@/components/VacancyForm';
+import JobForm from '@/components/JobForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Eye, MapPin, DollarSign, Mail, Phone, User, Edit, Trash2 } from 'lucide-react';
+import { Plus, Eye, MapPin, Mail, Phone, User, Edit, Trash2, Building } from 'lucide-react';
 
-interface Vacancy {
+interface Job {
   id: string;
   title: string;
   description: string;
+  requirements: string;
   location: string;
   employment_type: string;
   salary_min: number;
   salary_max: number;
-  views: number;
+  status: string;
   created_at: string;
+  company_id: string;
+  companies: {
+    name: string;
+  };
 }
 
 interface Application {
@@ -47,23 +52,23 @@ interface Application {
   resume_id?: string;
   resume_file_url?: string;
   resume_link?: string;
-  vacancy_id: string;
+  job_id: string;
   profiles?: {
     email: string;
     phone: string;
   } | null;
-  vacancies: {
+  jobs: {
     title: string;
-    employer_id: string;
+    company_id: string;
   };
 }
 
 const Employer = () => {
-  const [vacancies, setVacancies] = useState<Vacancy[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showVacancyForm, setShowVacancyForm] = useState(false);
-  const [editingVacancy, setEditingVacancy] = useState<Vacancy | null>(null);
+  const [showJobForm, setShowJobForm] = useState(false);
+  const [editingJob, setEditingJob] = useState<Job | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -73,44 +78,60 @@ const Employer = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch vacancies
-      const { data: vacanciesData, error: vacanciesError } = await supabase
-        .from('vacancies')
-        .select('*')
-        .eq('employer_id', user?.id)
+      // First get companies owned by the user
+      const { data: companies, error: companiesError } = await supabase
+        .from('companies')
+        .select('id')
+        .eq('owner_id', user?.id);
+
+      if (companiesError) throw companiesError;
+
+      const companyIds = companies?.map(c => c.id) || [];
+
+      if (companyIds.length === 0) {
+        setJobs([]);
+        setApplications([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch jobs for these companies
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('jobs')
+        .select(`
+          *,
+          companies (
+            name
+          )
+        `)
+        .in('company_id', companyIds)
         .order('created_at', { ascending: false });
 
-      if (vacanciesError) throw vacanciesError;
+      if (jobsError) throw jobsError;
 
-      // Fetch applications using secure view
-      const { data: applicationsData, error: applicationsError } = await supabase
-        .from('applications_for_employers')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Fetch applications for these jobs
+      const jobIds = jobsData?.map(j => j.id) || [];
+      
+      if (jobIds.length > 0) {
+        const { data: applicationsData, error: applicationsError } = await supabase
+          .from('applications')
+          .select(`
+            *,
+            profiles (email, phone),
+            jobs!inner (title, company_id)
+          `)
+          .in('job_id', jobIds)
+          .order('created_at', { ascending: false });
 
-      if (applicationsError) throw applicationsError;
-
-      // Fetch vacancy details separately for applications
-      const applicationPromises = (applicationsData || []).map(async (app) => {
-        const { data: vacancyData } = await supabase
-          .from('vacancies')
-          .select('title, employer_id')
-          .eq('id', app.vacancy_id)
-          .single();
+        if (applicationsError) throw applicationsError;
         
-        return {
+        setApplications((applicationsData || []).map(app => ({
           ...app,
-          vacancies: vacancyData
-        };
-      });
+          applied_by: app.applied_by as 'candidate' | 'guest'
+        })));
+      }
 
-      const applicationsWithVacancies = await Promise.all(applicationPromises);
-
-      setVacancies(vacanciesData || []);
-      setApplications((applicationsWithVacancies || []).map(app => ({
-        ...app,
-        applied_by: app.applied_by as 'candidate' | 'guest'
-      })));
+      setJobs(jobsData || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -135,17 +156,17 @@ const Employer = () => {
     return new Date(dateString).toLocaleDateString('ru-RU');
   };
 
-  const handleEditVacancy = (vacancy: Vacancy) => {
-    setEditingVacancy(vacancy);
-    setShowVacancyForm(true);
+  const handleEditJob = (job: Job) => {
+    setEditingJob(job);
+    setShowJobForm(true);
   };
 
-  const handleDeleteVacancy = async (vacancyId: string) => {
+  const handleDeleteJob = async (jobId: string) => {
     try {
       const { error } = await supabase
-        .from('vacancies')
+        .from('jobs')
         .delete()
-        .eq('id', vacancyId);
+        .eq('id', jobId);
 
       if (error) throw error;
 
@@ -156,7 +177,7 @@ const Employer = () => {
       
       fetchData();
     } catch (error) {
-      console.error('Error deleting vacancy:', error);
+      console.error('Error deleting job:', error);
       toast({
         title: "Ошибка",
         description: "Не удалось удалить вакансию",
@@ -165,9 +186,9 @@ const Employer = () => {
     }
   };
 
-  const handleVacancyFormClose = () => {
-    setShowVacancyForm(false);
-    setEditingVacancy(null);
+  const handleJobFormClose = () => {
+    setShowJobForm(false);
+    setEditingJob(null);
   };
 
   if (loading) {
@@ -191,30 +212,30 @@ const Employer = () => {
             <h1 className="text-3xl font-bold">Кабинет работодателя</h1>
             <p className="text-muted-foreground">Управляйте вакансиями и просматривайте отклики</p>
           </div>
-          <Button onClick={() => setShowVacancyForm(true)}>
+          <Button onClick={() => setShowJobForm(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Новая вакансия
           </Button>
         </div>
 
-        <Tabs defaultValue="vacancies" className="space-y-6">
+        <Tabs defaultValue="jobs" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="vacancies">
-              Мои вакансии ({vacancies.length})
+            <TabsTrigger value="jobs">
+              Мои вакансии ({jobs.length})
             </TabsTrigger>
             <TabsTrigger value="applications">
               Отклики ({applications.length})
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="vacancies" className="space-y-6">
-            {vacancies.length === 0 ? (
+          <TabsContent value="jobs" className="space-y-6">
+            {jobs.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <div className="text-muted-foreground mb-4">
                     У вас пока нет размещенных вакансий
                   </div>
-                  <Button onClick={() => setShowVacancyForm(true)}>
+                  <Button onClick={() => setShowJobForm(true)}>
                     <Plus className="w-4 h-4 mr-2" />
                     Создать первую вакансию
                   </Button>
@@ -233,44 +254,46 @@ const Employer = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Название</TableHead>
+                        <TableHead>Компания</TableHead>
                         <TableHead>Дата создания</TableHead>
-                        <TableHead>Просмотры</TableHead>
                         <TableHead>Статус</TableHead>
                         <TableHead className="text-right">Действия</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {vacancies.map((vacancy) => (
-                        <TableRow key={vacancy.id}>
+                      {jobs.map((job) => (
+                        <TableRow key={job.id}>
                           <TableCell>
                             <div>
-                              <div className="font-medium">{vacancy.title}</div>
+                              <div className="font-medium">{job.title}</div>
                               <div className="text-sm text-muted-foreground">
-                                {vacancy.location && (
+                                {job.location && (
                                   <span className="flex items-center">
                                     <MapPin className="w-3 h-3 mr-1" />
-                                    {vacancy.location}
+                                    {job.location}
                                   </span>
                                 )}
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>{formatDate(vacancy.created_at)}</TableCell>
                           <TableCell>
-                            <div className="flex items-center">
-                              <Eye className="w-4 h-4 mr-1" />
-                              {vacancy.views}
+                            <div className="flex items-center gap-2">
+                              <Building className="w-4 h-4" />
+                              {job.companies?.name}
                             </div>
                           </TableCell>
+                          <TableCell>{formatDate(job.created_at)}</TableCell>
                           <TableCell>
-                            <Badge variant="secondary">Активна</Badge>
+                            <Badge variant={job.status === 'published' ? 'default' : 'secondary'}>
+                              {job.status === 'published' ? 'Опубликована' : 'Черновик'}
+                            </Badge>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex gap-2 justify-end">
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleEditVacancy(vacancy)}
+                                onClick={() => handleEditJob(job)}
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -290,7 +313,7 @@ const Employer = () => {
                                   <AlertDialogFooter>
                                     <AlertDialogCancel>Отмена</AlertDialogCancel>
                                     <AlertDialogAction
-                                      onClick={() => handleDeleteVacancy(vacancy.id)}
+                                      onClick={() => handleDeleteJob(job.id)}
                                     >
                                       Удалить
                                     </AlertDialogAction>
@@ -342,7 +365,7 @@ const Employer = () => {
                         <TableRow key={application.id}>
                           <TableCell>
                             <div className="font-medium">
-                              {application.vacancies.title}
+                              {application.jobs.title}
                             </div>
                           </TableCell>
                           <TableCell>
@@ -423,11 +446,11 @@ const Employer = () => {
         </Tabs>
       </div>
 
-      <VacancyForm
-        open={showVacancyForm}
-        onOpenChange={handleVacancyFormClose}
+      <JobForm
+        open={showJobForm}
+        onOpenChange={handleJobFormClose}
         onSubmit={fetchData}
-        vacancy={editingVacancy}
+        job={editingJob}
       />
     </div>
   );

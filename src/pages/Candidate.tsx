@@ -9,7 +9,7 @@ import ResumeForm from '@/components/ResumeForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, MapPin, DollarSign, Clock, Edit, Eye, Trash2 } from 'lucide-react';
+import { Plus, MapPin, DollarSign, Clock, Edit, Eye, Trash2, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Application {
@@ -23,13 +23,17 @@ interface Application {
   guest_name?: string;
   guest_email?: string;
   guest_phone?: string;
-  vacancies: {
+  job_id: string;
+  jobs: {
     id: string;
     title: string;
     location: string;
     salary_min: number;
     salary_max: number;
     employment_type: string;
+    companies: {
+      name: string;
+    };
   };
 }
 
@@ -62,29 +66,27 @@ const Candidate = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch applications using secure view
+      // Fetch applications
       const { data: applicationsData, error: applicationsError } = await supabase
-        .from('applications_for_candidates')
-        .select('*')
+        .from('applications')
+        .select(`
+          *,
+          jobs!inner (
+            id,
+            title,
+            location,
+            salary_min,
+            salary_max,
+            employment_type,
+            companies (
+              name
+            )
+          )
+        `)
+        .eq('candidate_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (applicationsError) throw applicationsError;
-
-      // Fetch vacancy details separately for applications
-      const applicationPromises = (applicationsData || []).map(async (app) => {
-        const { data: vacancyData } = await supabase
-          .from('vacancies')
-          .select('id, title, location, salary_min, salary_max, employment_type')
-          .eq('id', app.vacancy_id)
-          .single();
-        
-        return {
-          ...app,
-          vacancies: vacancyData
-        };
-      });
-
-      const applicationsWithVacancies = await Promise.all(applicationPromises);
 
       // Fetch resumes
       const { data: resumesData, error: resumesError } = await supabase
@@ -95,10 +97,7 @@ const Candidate = () => {
 
       if (resumesError) throw resumesError;
 
-      setApplications((applicationsWithVacancies || []).map(app => ({
-        ...app,
-        applied_by: app.applied_by as 'candidate' | 'guest'
-      })));
+      setApplications((applicationsData || []) as Application[]);
       setResumes((resumesData || []).map(resume => ({
         ...resume,
         experience: resume.experience as any[],
@@ -224,18 +223,22 @@ const Candidate = () => {
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <CardTitle className="text-xl">
-                            {application.vacancies.title}
+                            {application.jobs.title}
                           </CardTitle>
                           <CardDescription className="flex flex-wrap gap-4 mt-2">
-                            {application.vacancies.location && (
+                            <span className="flex items-center gap-1">
+                              <Building className="w-4 h-4" />
+                              {application.jobs.companies?.name || 'Компания'}
+                            </span>
+                            {application.jobs.location && (
                               <span className="flex items-center">
                                 <MapPin className="w-4 h-4 mr-1" />
-                                {application.vacancies.location}
+                                {application.jobs.location}
                               </span>
                             )}
                             <span className="flex items-center">
                               <DollarSign className="w-4 h-4 mr-1" />
-                              {formatSalary(application.vacancies.salary_min, application.vacancies.salary_max)}
+                              {formatSalary(application.jobs.salary_min, application.jobs.salary_max)}
                             </span>
                             <span className="flex items-center">
                               <Clock className="w-4 h-4 mr-1" />
@@ -245,44 +248,41 @@ const Candidate = () => {
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           <Badge variant="secondary">
-                            {application.vacancies.employment_type}
+                            {application.jobs.employment_type}
                           </Badge>
-                          <div className="text-xs text-muted-foreground">
-                            {application.applied_by === 'candidate' ? 'Авторизованный' : 'Гость'}
-                          </div>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {/* Resume info */}
                       {(application.resume_id || application.resume_file_url || application.resume_link) && (
                         <div>
                           <h4 className="font-medium mb-2">Резюме:</h4>
-                          {application.resume_id && (
-                            <Button variant="outline" size="sm" asChild>
-                              <Link to={`/resumes/${application.resume_id}`}>
-                                Открыть резюме
-                              </Link>
-                            </Button>
-                          )}
-                          {application.resume_file_url && (
-                            <Button variant="outline" size="sm" asChild>
-                              <a href={application.resume_file_url} target="_blank" rel="noopener noreferrer">
-                                Скачать файл
-                              </a>
-                            </Button>
-                          )}
-                          {application.resume_link && (
-                            <Button variant="outline" size="sm" asChild>
-                              <a href={application.resume_link} target="_blank" rel="noopener noreferrer">
-                                Открыть ссылку
-                              </a>
-                            </Button>
-                          )}
+                          <div className="flex gap-2 flex-wrap">
+                            {application.resume_id && (
+                              <Button variant="outline" size="sm" asChild>
+                                <Link to={`/resumes/${application.resume_id}`}>
+                                  Открыть резюме
+                                </Link>
+                              </Button>
+                            )}
+                            {application.resume_file_url && (
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={application.resume_file_url} target="_blank" rel="noopener noreferrer">
+                                  Скачать файл
+                                </a>
+                              </Button>
+                            )}
+                            {application.resume_link && (
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={application.resume_link} target="_blank" rel="noopener noreferrer">
+                                  Открыть ссылку
+                                </a>
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       )}
                       
-                      {/* Message */}
                       {application.message && (
                         <div>
                           <h4 className="font-medium mb-2">Сопроводительное письмо:</h4>

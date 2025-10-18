@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,32 +8,96 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
+
+interface Job {
+  id: string;
+  title: string;
+  description: string;
+  requirements: string;
+  location: string;
+  employment_type: string;
+  salary_min: number;
+  salary_max: number;
+  company_id: string;
+  status: string;
+}
 
 interface JobFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: () => void;
+  job?: Job | null;
 }
 
-export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
+const JobForm = ({ open, onOpenChange, onSubmit, job }: JobFormProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [companies, setCompanies] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     title: "",
-    company_name: "",
+    company_id: "",
     location: "",
-    salary: "",
+    salary_min: "",
+    salary_max: "",
     employment_type: "",
     description: "",
     requirements: "",
-    employer_email: "",
+    status: "published",
   });
+
+  useEffect(() => {
+    if (open) {
+      fetchCompanies();
+      if (job) {
+        setFormData({
+          title: job.title || "",
+          company_id: job.company_id || "",
+          location: job.location || "",
+          salary_min: job.salary_min?.toString() || "",
+          salary_max: job.salary_max?.toString() || "",
+          employment_type: job.employment_type || "",
+          description: job.description || "",
+          requirements: job.requirements || "",
+          status: job.status || "published",
+        });
+      } else {
+        setFormData({
+          title: "",
+          company_id: "",
+          location: "",
+          salary_min: "",
+          salary_max: "",
+          employment_type: "",
+          description: "",
+          requirements: "",
+          status: "published",
+        });
+      }
+    }
+  }, [open, job]);
+
+  const fetchCompanies = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('owner_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setCompanies(data || []);
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.company_name || !formData.employer_email) {
+    if (!formData.title || !formData.company_id) {
       toast({
         title: "Ошибка",
         description: "Пожалуйста, заполните все обязательные поля",
@@ -45,36 +109,50 @@ export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
-        .from('jobs')
-        .insert([formData]);
+      const jobData = {
+        title: formData.title,
+        company_id: formData.company_id,
+        location: formData.location || null,
+        salary_min: formData.salary_min ? parseInt(formData.salary_min) : null,
+        salary_max: formData.salary_max ? parseInt(formData.salary_max) : null,
+        employment_type: formData.employment_type || null,
+        description: formData.description || null,
+        requirements: formData.requirements || null,
+        status: formData.status,
+      };
+
+      let error;
+      if (job) {
+        // Update existing job
+        const result = await supabase
+          .from('jobs')
+          .update(jobData)
+          .eq('id', job.id);
+        error = result.error;
+      } else {
+        // Create new job
+        const result = await supabase
+          .from('jobs')
+          .insert([jobData]);
+        error = result.error;
+      }
 
       if (error) {
         throw error;
       }
 
-      setFormData({
-        title: "",
-        company_name: "",
-        location: "",
-        salary: "",
-        employment_type: "",
-        description: "",
-        requirements: "",
-        employer_email: "",
-      });
       onOpenChange(false);
-      onSubmit(); // Уведомляем родительский компонент о создании вакансии
+      onSubmit();
       
       toast({
         title: "Успешно!",
-        description: "Вакансия успешно размещена",
+        description: job ? "Вакансия обновлена" : "Вакансия успешно размещена",
       });
     } catch (error) {
-      console.error("Error creating job:", error);
+      console.error("Error saving job:", error);
       toast({
         title: "Ошибка",
-        description: "Не удалось разместить вакансию. Попробуйте еще раз.",
+        description: "Не удалось сохранить вакансию. Попробуйте еще раз.",
         variant: "destructive",
       });
     } finally {
@@ -92,7 +170,7 @@ export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary" />
-            Разместить вакансию
+            {job ? "Редактировать вакансию" : "Разместить вакансию"}
           </DialogTitle>
           <DialogDescription>
             Заполните информацию о вакансии. Поля отмеченные * обязательны для заполнения.
@@ -100,48 +178,68 @@ export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Должность *</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => handleInputChange("title", e.target.value)}
-                placeholder="Frontend разработчик"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="company">Компания *</Label>
-              <Input
-                id="company"
-                value={formData.company_name}
-                onChange={(e) => handleInputChange("company_name", e.target.value)}
-                placeholder="ООО Технологии"
-                required
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="title">Должность *</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => handleInputChange("title", e.target.value)}
+              placeholder="Frontend разработчик"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="company">Компания *</Label>
+            <Select value={formData.company_id} onValueChange={(value) => handleInputChange("company_id", value)} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите компанию" />
+              </SelectTrigger>
+              <SelectContent>
+                {companies.map((company) => (
+                  <SelectItem key={company.id} value={company.id}>
+                    {company.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {companies.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                Сначала создайте компанию в настройках профиля
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location">Местоположение</Label>
+            <Input
+              id="location"
+              value={formData.location}
+              onChange={(e) => handleInputChange("location", e.target.value)}
+              placeholder={t('form.locationPlaceholder')}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="location">Местоположение</Label>
+              <Label htmlFor="salary_min">{t('form.salaryFrom')}</Label>
               <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => handleInputChange("location", e.target.value)}
-                placeholder={t('form.locationPlaceholder')}
+                id="salary_min"
+                type="number"
+                value={formData.salary_min}
+                onChange={(e) => handleInputChange("salary_min", e.target.value)}
+                placeholder="50000"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="salary">Зарплата</Label>
+              <Label htmlFor="salary_max">{t('form.salaryTo')}</Label>
               <Input
-                id="salary"
-                value={formData.salary}
-                onChange={(e) => handleInputChange("salary", e.target.value)}
-                placeholder={t('form.salaryPlaceholder')}
+                id="salary_max"
+                type="number"
+                value={formData.salary_max}
+                onChange={(e) => handleInputChange("salary_max", e.target.value)}
+                placeholder="150000"
               />
             </div>
           </div>
@@ -160,18 +258,6 @@ export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
                 <SelectItem value="Удаленная работа">{t('employment.remote')}</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email для откликов *</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.employer_email}
-              onChange={(e) => handleInputChange("employer_email", e.target.value)}
-              placeholder="hr@company.com"
-              required
-            />
           </div>
 
           <div className="space-y-2">
@@ -196,9 +282,22 @@ export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="status">Статус</Label>
+            <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="published">Опубликована</SelectItem>
+                <SelectItem value="draft">Черновик</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="flex gap-2 pt-4">
-            <Button type="submit" className="flex-1" disabled={isSubmitting}>
-              {isSubmitting ? "Размещается..." : "Разместить вакансию"}
+            <Button type="submit" className="flex-1" disabled={isSubmitting || companies.length === 0}>
+              {isSubmitting ? "Сохраняется..." : (job ? "Обновить вакансию" : "Разместить вакансию")}
             </Button>
             <Button 
               type="button" 
@@ -214,3 +313,5 @@ export const JobForm = ({ open, onOpenChange, onSubmit }: JobFormProps) => {
     </Dialog>
   );
 };
+
+export default JobForm;
