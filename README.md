@@ -145,9 +145,38 @@ pnpm preview          # Preview production build
 pnpm test:e2e         # Run Playwright E2E tests
 pnpm test:e2e:headed  # Run tests in headed mode
 
+# View Playwright test report
+npx playwright show-report
+
 # Linting
 pnpm lint             # Run ESLint
 ```
+
+## 🔄 Continuous Integration
+
+CI runs automatically on push/PR to main branch via GitHub Actions (`.github/workflows/ci.yml`):
+
+- **Build**: Validates that `pnpm build` succeeds
+- **Tests**: Runs all Playwright E2E tests
+- **Artifacts**: On test failure, downloads `playwright-report` artifact from GitHub Actions run page
+- **Cache**: pnpm store and Playwright browsers cached for faster runs
+
+### CI Environment Setup
+
+CI uses `.env.example.ci` (test credentials, no secrets). To test CI locally:
+
+```bash
+cp .env.example.ci .env
+pnpm install --frozen-lockfile
+pnpm build
+npx playwright install --with-deps
+pnpm test:e2e
+```
+
+### Viewing Test Reports
+
+- **Locally**: Run `npx playwright show-report` after tests
+- **In CI**: Download `playwright-report` artifact from failed GitHub Actions run, extract, and open `index.html`
 
 ## 🏗️ Project Architecture
 
