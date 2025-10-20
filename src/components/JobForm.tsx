@@ -10,6 +10,7 @@ import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
+import { trackPostJob } from "@/lib/analytics";
 
 interface Job {
   id: string;
@@ -121,7 +122,7 @@ const JobForm = ({ open, onOpenChange, onSubmit, job }: JobFormProps) => {
         status: formData.status,
       };
 
-      let error;
+      let error, insertedJob;
       if (job) {
         // Update existing job
         const result = await supabase
@@ -133,8 +134,19 @@ const JobForm = ({ open, onOpenChange, onSubmit, job }: JobFormProps) => {
         // Create new job
         const result = await supabase
           .from('jobs')
-          .insert([jobData]);
+          .insert([jobData])
+          .select()
+          .single();
         error = result.error;
+        insertedJob = result.data;
+        
+        // Track job posting in GA4
+        if (!error && insertedJob) {
+          trackPostJob({
+            job_id: insertedJob.id,
+            paid: false, // Update based on your payment logic
+          });
+        }
       }
 
       if (error) {

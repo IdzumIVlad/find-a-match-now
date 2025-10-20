@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { trackViewJob } from '@/lib/analytics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +24,7 @@ interface Job {
   salary_max: number;
   created_at: string;
   companies: {
+    id?: string;
     name: string;
     logo_url?: string;
   };
@@ -48,6 +50,7 @@ const JobDetail = () => {
           .select(`
             *,
             companies (
+              id,
               name,
               logo_url
             )
@@ -70,6 +73,14 @@ const JobDetail = () => {
         }
 
         setJob(data as Job);
+        
+        // Track job view
+        trackViewJob({
+          job_id: data.id,
+          company_id: data.companies?.id,
+          location: data.location || '',
+          is_remote: data.employment_type?.toLowerCase().includes('remote') || data.employment_type?.toLowerCase().includes('удален'),
+        });
       } catch (error) {
         console.error('Error:', error);
         toast.error('Ошибка при загрузке вакансии');
@@ -256,6 +267,7 @@ const JobDetail = () => {
         jobId={job.id}
         jobTitle={job.title}
         companyName={job.companies?.name || 'Компания'}
+        companyId={job.companies?.id}
       />
     </div>
   );

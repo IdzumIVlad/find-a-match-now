@@ -178,6 +178,53 @@ pnpm test:e2e
 - **Locally**: Run `npx playwright show-report` after tests
 - **In CI**: Download `playwright-report` artifact from failed GitHub Actions run, extract, and open `index.html`
 
+## 📊 Google Analytics 4
+
+The application integrates Google Analytics 4 for tracking user behavior and events.
+
+### Setup
+
+Add your GA4 Measurement ID to the `.env` file:
+
+```env
+VITE_GA4_ID=G-XXXXXXXXXX
+```
+
+Leave this variable empty or omit it to disable analytics (e.g., for local development or CI).
+
+### Tracked Events
+
+The following custom events are automatically tracked:
+
+1. **Page Views**: Tracked on every route change
+   - `page_view` - includes page path and title
+
+2. **Job Search**:
+   - `search_jobs` - parameters: `query`, `location`, `filters_count`
+
+3. **Job Viewing**:
+   - `view_job` - parameters: `job_id`, `company_id`, `location`, `is_remote`
+
+4. **Job Application**:
+   - `apply_job` - parameters: `job_id`, `company_id`
+
+5. **User Registration**:
+   - `signup_candidate` - when a candidate completes profile
+   - `signup_employer` - when an employer completes profile
+
+6. **Job Posting**:
+   - `post_job` - parameters: `job_id`, `paid` (boolean)
+
+### Viewing Events in GA4
+
+1. Log in to [Google Analytics](https://analytics.google.com/)
+2. Navigate to your property
+3. Go to **Reports** → **Engagement** → **Events**
+4. You'll see all custom events listed with their occurrence counts
+5. Click on an event name to see detailed parameters and user interactions
+
+For real-time monitoring, use **Reports** → **Realtime** → **Event count by Event name**
+
 ## 🏗️ Project Architecture
 
 ```

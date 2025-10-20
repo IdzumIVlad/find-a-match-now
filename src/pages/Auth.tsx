@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useTranslation } from 'react-i18next';
+import { trackSignupCandidate, trackSignupEmployer } from '@/lib/analytics';
 
 const Auth = () => {
   const { t } = useTranslation();
@@ -75,6 +76,8 @@ const Auth = () => {
         title: t("auth.signUpSuccess"),
         description: t("auth.checkEmail"),
       });
+      
+      // Note: Role-specific tracking happens in CompleteProfileModal
     }
     
     setLoading(false);

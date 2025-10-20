@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/contexts/AuthContext';
 import PhoneInput from '@/components/PhoneInput';
 import { useToast } from '@/hooks/use-toast';
+import { trackSignupCandidate, trackSignupEmployer } from '@/lib/analytics';
 
 interface CompleteProfileModalProps {
   open: boolean;
@@ -49,6 +50,13 @@ const CompleteProfileModal = ({ open, onClose }: CompleteProfileModalProps) => {
       });
       setLoading(false);
     } else {
+      // Track role-specific signup in GA4
+      if (role === 'candidate') {
+        trackSignupCandidate();
+      } else if (role === 'employer') {
+        trackSignupEmployer();
+      }
+      
       toast({
         title: "Профиль создан",
         description: "Ваш профиль успешно создан",

@@ -14,6 +14,7 @@ import SEOHead from '@/components/SEOHead';
 import { HelmetProvider } from 'react-helmet-async';
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from 'react-i18next';
+import { trackSearchJobs } from '@/lib/analytics';
 
 const Index = () => {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -131,7 +132,13 @@ const Index = () => {
               <Input
                 placeholder={t('home.searchPlaceholder')}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSearchTerm(value);
+                  if (value) {
+                    trackSearchJobs({ query: value });
+                  }
+                }}
                 className="pl-10 bg-white text-foreground"
               />
             </div>

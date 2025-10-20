@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEventLogger } from "@/hooks/useEventLogger";
 import { useRateLimit } from "@/hooks/useRateLimit";
 import { useTranslation } from "react-i18next";
+import { trackApplyJob } from "@/lib/analytics";
 
 interface ApplicationFormProps {
   open: boolean;
@@ -17,9 +18,10 @@ interface ApplicationFormProps {
   jobId: string;
   jobTitle: string;
   companyName: string;
+  companyId?: string;
 }
 
-export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyName }: ApplicationFormProps) => {
+export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyName, companyId }: ApplicationFormProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { logEvent } = useEventLogger();
@@ -104,6 +106,12 @@ export const ApplicationForm = ({ open, onOpenChange, jobId, jobTitle, companyNa
         job_title: jobTitle,
         company_name: companyName,
         applicant_email: formData.email
+      });
+
+      // Track application in GA4
+      trackApplyJob({
+        job_id: jobId,
+        company_id: companyId,
       });
 
       await supabase

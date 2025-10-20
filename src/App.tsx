@@ -1,8 +1,9 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { HelmetProvider } from 'react-helmet-async';
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -18,8 +19,23 @@ import Terms from "./pages/terms";
 import Privacy from "./pages/privacy";
 import Contact from "./pages/contact";
 import NotFound from "./pages/NotFound";
+import { initGA4, trackPageView } from "@/lib/analytics";
 
 const queryClient = new QueryClient();
+
+// Initialize GA4 on app load
+initGA4();
+
+// Component to track route changes
+const RouteTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search);
+  }, [location]);
+
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -29,6 +45,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <RouteTracker />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
