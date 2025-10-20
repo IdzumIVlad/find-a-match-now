@@ -83,10 +83,11 @@ const Contact = () => {
 
   return (
     <>
-      <SEOHead
-        title="Contacto - LaburoGO"
-        description="Ponete en contacto con el equipo de LaburoGO. Estamos acá para ayudarte."
-        keywords="contacto, soporte, ayuda, LaburoGO"
+      <SEOHead 
+        title="Contacto - Comunícate con nosotros"
+        description="¿Tienes preguntas o sugerencias? Contáctanos. El equipo de laburoGO está aquí para ayudarte con consultas sobre empleo, reclutamiento y uso de la plataforma."
+        keywords="contacto, soporte, ayuda, atención al cliente, consultas"
+        type="website"
       />
       
       <div className="min-h-screen bg-background">

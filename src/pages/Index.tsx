@@ -111,9 +111,10 @@ const Index = () => {
     <HelmetProvider>
       <div className="min-h-screen bg-background">
         <SEOHead 
-          title={t('home.title')}
-          description="Найдите работу мечты или идеального сотрудника на laburoGO. Простая платформа для поиска работы и талантов с быстрыми откликами."
-          keywords="работа, вакансии, поиск работы, трудоустройство, резюме, кандидаты"
+          title="Encuentra trabajo y talento"
+          description="Plataforma de búsqueda de empleo en Argentina. Publica vacantes, encuentra candidatos ideales o aplica a trabajos de forma rápida y sencilla. Conecta empleadores con talentos."
+          keywords="trabajo, empleo, vacantes, búsqueda de trabajo, reclutamiento, cv, curriculum, Argentina, laburo, trabajo remoto"
+          type="website"
         />
         <Header />
       

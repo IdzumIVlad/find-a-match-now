@@ -225,6 +225,70 @@ The following custom events are automatically tracked:
 
 For real-time monitoring, use **Reports** → **Realtime** → **Event count by Event name**
 
+## 🔍 SEO Configuration
+
+The application includes comprehensive SEO optimization:
+
+### Features
+
+1. **Meta Tags**: All pages have optimized `<title>`, `<meta description>`, and keywords
+2. **Open Graph**: Social media sharing with `og:title`, `og:description`, `og:image`, `og:url`
+3. **Twitter Cards**: Optimized cards for Twitter sharing
+4. **Canonical URLs**: Prevents duplicate content issues
+5. **Structured Data**: JSON-LD for job postings (Google for Jobs compatibility)
+6. **robots.txt**: Controls search engine crawling
+7. **sitemap.xml**: Helps search engines discover all pages
+
+### Dynamic Job Meta Tags
+
+Each job posting automatically generates:
+- SEO-friendly title with job title, company, and location
+- Truncated description (155 chars max)
+- Keywords based on job details
+- Structured data for Google for Jobs
+- Open Graph tags for social sharing
+
+### Sitemap Generation
+
+The sitemap includes:
+- All static pages (home, auth, resumes, terms, privacy, contact)
+- All published job postings (up to 1000 most recent)
+- Last modification dates and priority weights
+
+**To regenerate sitemap:**
+
+```bash
+# Install tsx if not already installed
+npm install -D tsx
+
+# Generate sitemap with current jobs
+npx tsx scripts/generate-sitemap.ts
+
+# Or add to package.json scripts:
+# "generate-sitemap": "tsx scripts/generate-sitemap.ts"
+npm run generate-sitemap
+```
+
+**Environment variables for sitemap:**
+- `VITE_SITE_URL`: Your production domain (default: https://laburogо.com)
+- `VITE_SUPABASE_URL`: Supabase project URL
+- `VITE_SUPABASE_PUBLISHABLE_KEY`: Supabase anon key
+
+**Automation Options:**
+
+1. **Manual**: Run script before each deployment
+2. **CI/CD**: Add to `.github/workflows/ci.yml` before build step
+3. **Scheduled**: Set up cron job or GitHub Action to regenerate weekly
+4. **On-demand**: Create Supabase Edge Function triggered by new job posts
+
+### Robots.txt Configuration
+
+The `robots.txt` file:
+- Allows all search engines to crawl public pages
+- Blocks private areas (dashboard, employer, candidate, auth)
+- Includes sitemap URL for search engines
+- Sets crawl delays for major bots
+
 ## 🏗️ Project Architecture
 
 ```

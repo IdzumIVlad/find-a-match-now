@@ -140,11 +140,25 @@ const JobDetail = () => {
     );
   }
 
+  const truncateDescription = (text: string | null, maxLength: number = 155) => {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
-        title={`${job.title} в ${job.companies?.name || 'компании'} | Работа`}
-        description={`${job.title} в компании ${job.companies?.name || ''}. ${job.location ? `Локация: ${job.location}. ` : ''}${formatSalary(job.salary_min, job.salary_max)}. Подать заявку онлайн.`}
+        title={`${job.title} en ${job.companies?.name || 'compañía'}`}
+        description={truncateDescription(job.description) || `${job.title} en ${job.companies?.name}. ${job.location || 'Argentina'}. ${formatSalary(job.salary_min, job.salary_max)}. Aplica ahora.`}
+        type="job_posting"
+        keywords={`trabajo, empleo, ${job.title}, ${job.companies?.name}, ${job.location || 'Argentina'}, ${job.employment_type || 'tiempo completo'}`}
+        jobTitle={job.title}
+        companyName={job.companies?.name}
+        location={job.location || undefined}
+        salaryMin={job.salary_min}
+        salaryMax={job.salary_max}
+        isRemote={job.employment_type?.toLowerCase().includes('remot') || job.employment_type?.toLowerCase().includes('удален')}
+        datePosted={job.created_at}
       />
       
       <Header />

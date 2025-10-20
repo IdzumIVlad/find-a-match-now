@@ -11,9 +11,10 @@ const Terms = () => {
   return (
     <>
       <SEOHead
-        title="Términos y Condiciones - LaburoGO"
-        description="Conocé los términos y condiciones de uso de la plataforma LaburoGO"
-        keywords="términos de uso, condiciones, acuerdo de usuario, LaburoGO"
+        title="Términos y Condiciones de Uso"
+        description="Términos y condiciones de uso de laburoGO. Conoce tus derechos y obligaciones al usar nuestra plataforma de búsqueda de empleo."
+        keywords="términos y condiciones, condiciones de uso, política de uso, términos legales"
+        type="article"
       />
       
       <div className="min-h-screen bg-background">

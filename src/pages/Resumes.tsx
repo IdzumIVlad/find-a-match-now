@@ -142,6 +142,12 @@ const Resumes = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="Base de CVs - Encuentra candidatos"
+        description="Explora perfiles de candidatos calificados. Encuentra el talento perfecto para tu empresa. Accede a CVs verificados y contacta candidatos directamente."
+        keywords="base de datos cv, buscar candidatos, reclutamiento, recursos humanos, talento, perfiles profesionales"
+        type="website"
+      />
       <Header />
       
       <div className="container mx-auto px-4 py-8">

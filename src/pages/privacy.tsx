@@ -10,10 +10,11 @@ const Privacy = () => {
 
   return (
     <>
-      <SEOHead
-        title="Política de Privacidad - LaburoGO"
-        description="Conocé cómo LaburoGO recopila, usa y protege tus datos personales"
-        keywords="política de privacidad, protección de datos, datos personales, LaburoGO"
+      <SEOHead 
+        title="Política de Privacidad"
+        description="Conoce cómo protegemos tu información personal en laburoGO. Política de privacidad, tratamiento de datos y derechos del usuario."
+        keywords="política de privacidad, protección de datos, GDPR, privacidad online"
+        type="article"
       />
       
       <div className="min-h-screen bg-background">
