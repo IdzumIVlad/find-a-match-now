@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Lock, Mail, Phone, Eye, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SEOHead from '@/components/SEOHead';
 
 interface Resume {
   id: string;
