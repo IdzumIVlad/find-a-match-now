@@ -30,7 +30,7 @@ const JobCard = ({
   const { t } = useTranslation();
   
   return (
-    <Card className="bg-gradient-card shadow-card hover:shadow-hover transition-all duration-300 border-0" data-testid="job-card">
+    <Card className="bg-gradient-card shadow-card hover:shadow-hover transition-all duration-300 border-0 focus-within:ring-2 focus-within:ring-ring" data-testid="job-card">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="space-y-2">
@@ -39,16 +39,16 @@ const JobCard = ({
             </CardTitle>
             <div className="flex items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-1">
-                <Building2 className="w-4 h-4" />
-                {companyName}
+                <Building2 className="w-4 h-4" aria-hidden="true" />
+                <span aria-label={`Company: ${companyName}`}>{companyName}</span>
               </div>
               <div className="flex items-center gap-1">
-                <MapPin className="w-4 h-4" />
-                {location}
+                <MapPin className="w-4 h-4" aria-hidden="true" />
+                <span aria-label={`Location: ${location}`}>{location}</span>
               </div>
               <div className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
-                {postedDate}
+                <Calendar className="w-4 h-4" aria-hidden="true" />
+                <span aria-label={`Posted: ${postedDate}`}>{postedDate}</span>
               </div>
             </div>
           </div>
@@ -66,7 +66,8 @@ const JobCard = ({
         </CardDescription>
         <Button 
           onClick={() => onApply(id)}
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          aria-label={`Apply for ${title} at ${companyName}`}
         >
           {t("jobCard.apply")}
         </Button>

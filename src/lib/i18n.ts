@@ -20,6 +20,14 @@ const resources = {
       "common.myVacancies": "My Vacancies",
       "common.myResumes": "My Resumes",
       
+      // Accessibility
+      "common.skipToContent": "Skip to main content",
+      "common.homeLink": "Go to home page",
+      "common.mainNavigation": "Main navigation",
+      "common.resumesLink": "Browse resumes",
+      "common.userActions": "User actions",
+      "common.userMenu": "User menu",
+      
       // Actions
       "common.search": "Search",
       "common.save": "Save",
@@ -55,6 +63,9 @@ const resources = {
       "home.noJobsFound": "No jobs found",
       "home.postFirstJob": "Post first job",
       "home.loadingJobs": "Loading jobs...",
+      "home.searchAriaLabel": "Search for jobs by title, location or company",
+      "home.postJobAriaLabel": "Post a new job",
+      "home.jobsFound": "jobs found",
 
       // Auth
       "auth.signIn": "Sign In",
@@ -239,6 +250,14 @@ const resources = {
       "common.myVacancies": "Mis Vacantes",
       "common.myResumes": "Mis Currículums",
       
+      // Accessibility
+      "common.skipToContent": "Saltar al contenido principal",
+      "common.homeLink": "Ir a la página principal",
+      "common.mainNavigation": "Navegación principal",
+      "common.resumesLink": "Explorar currículums",
+      "common.userActions": "Acciones de usuario",
+      "common.userMenu": "Menú de usuario",
+      
       // Actions
       "common.search": "Buscar",
       "common.save": "Guardar",
@@ -274,6 +293,9 @@ const resources = {
       "home.noJobsFound": "No se encontraron trabajos",
       "home.postFirstJob": "Publicar primer trabajo",
       "home.loadingJobs": "Cargando trabajos...",
+      "home.searchAriaLabel": "Buscar trabajos por título, ubicación o empresa",
+      "home.postJobAriaLabel": "Publicar un nuevo trabajo",
+      "home.jobsFound": "trabajos encontrados",
 
       // Auth
       "auth.signIn": "Iniciar Sesión",
@@ -458,6 +480,14 @@ const resources = {
       "common.myVacancies": "Minhas Vagas",
       "common.myResumes": "Meus Currículos",
       
+      // Accessibility
+      "common.skipToContent": "Pular para o conteúdo principal",
+      "common.homeLink": "Ir para a página inicial",
+      "common.mainNavigation": "Navegação principal",
+      "common.resumesLink": "Explorar currículos",
+      "common.userActions": "Ações do usuário",
+      "common.userMenu": "Menu do usuário",
+      
       // Actions
       "common.search": "Buscar",
       "common.save": "Salvar",
@@ -493,6 +523,9 @@ const resources = {
       "home.noJobsFound": "Nenhuma vaga encontrada",
       "home.postFirstJob": "Publicar primeira vaga",
       "home.loadingJobs": "Carregando vagas...",
+      "home.searchAriaLabel": "Buscar vagas por título, localização ou empresa",
+      "home.postJobAriaLabel": "Publicar uma nova vaga",
+      "home.jobsFound": "vagas encontradas",
 
       // Auth
       "auth.signIn": "Entrar",
@@ -676,6 +709,14 @@ const resources = {
       "common.myVacancies": "Мои вакансии",
       "common.myResumes": "Мои резюме",
       
+      // Accessibility
+      "common.skipToContent": "Перейти к содержимому",
+      "common.homeLink": "На главную",
+      "common.mainNavigation": "Основная навигация",
+      "common.resumesLink": "База резюме",
+      "common.userActions": "Действия пользователя",
+      "common.userMenu": "Меню пользователя",
+      
       // Actions
       "common.search": "Поиск",
       "common.save": "Сохранить",
@@ -711,6 +752,9 @@ const resources = {
       "home.noJobsFound": "Вакансии не найдены",
       "home.postFirstJob": "Разместить первую вакансию",
       "home.loadingJobs": "Загрузка вакансий...",
+      "home.searchAriaLabel": "Поиск вакансий по названию, городу или компании",
+      "home.postJobAriaLabel": "Опубликовать новую вакансию",
+      "home.jobsFound": "вакансий найдено",
 
       // Auth
       "auth.signIn": "Войти",

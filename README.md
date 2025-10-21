@@ -349,6 +349,80 @@ tests/                 # E2E tests (Playwright)
    - Service role keys NEVER exposed to client
    - Third-party keys stored in Supabase Secrets
 
+## ♿ Accessibility (a11y)
+
+The platform follows WCAG 2.1 Level AA guidelines to ensure accessibility for all users.
+
+### Implemented Features
+
+#### Semantic HTML & Landmarks
+- Proper use of semantic HTML5 elements (`<header>`, `<main>`, `<nav>`, `<section>`)
+- ARIA landmarks for screen reader navigation
+- Single `<h1>` per page with proper heading hierarchy (h1 → h2 → h3)
+
+#### Keyboard Navigation
+- **Skip to main content** link appears on Tab key press (top-left)
+- All interactive elements (buttons, links, forms) are keyboard accessible
+- Visible focus indicators on all focusable elements
+- Logical tab order throughout the application
+
+#### Screen Reader Support
+- `aria-label` attributes on icon-only buttons and interactive elements
+- `aria-hidden="true"` on decorative icons
+- Descriptive labels on form inputs
+- Error messages associated with form fields
+
+#### Color & Contrast
+- All text meets WCAG AA contrast requirements (4.5:1 for normal text, 3:1 for large text)
+- Color is not the only means of conveying information
+- Support for dark mode with proper contrast in both themes
+
+#### Form Accessibility
+- All form inputs have associated `<label>` elements
+- Clear error messages and validation feedback
+- Required fields marked with asterisk and aria-required
+- Proper input types for better mobile experience
+
+### Testing Accessibility
+
+#### Automated Tests
+Run the accessibility test suite:
+```bash
+pnpm test tests/accessibility.spec.ts
+```
+
+The test suite validates:
+- Single h1 per page with proper hierarchy
+- Skip to content link functionality  
+- Keyboard navigation through interactive elements
+- Aria labels on buttons and inputs
+- Form label associations
+- Focus styles on interactive elements
+- Semantic HTML landmarks (header, main, nav)
+
+#### Manual Testing Checklist
+- [ ] Navigate entire site using only keyboard (Tab, Enter, Escape)
+- [ ] Test with screen reader (NVDA, JAWS, VoiceOver)
+- [ ] Verify color contrast using browser dev tools
+- [ ] Test form validation with screen reader
+- [ ] Ensure skip link works on first Tab press
+- [ ] Check focus visibility on all interactive elements
+
+#### Browser Extensions for Testing
+- **WAVE** (Web Accessibility Evaluation Tool)
+- **axe DevTools** - Automated accessibility testing
+- **Lighthouse** - Accessibility audit in Chrome DevTools
+- **Color Contrast Analyzer** - Verify WCAG compliance
+
+### Accessibility Guidelines
+When contributing:
+1. Always use semantic HTML elements
+2. Include aria-labels for icon-only buttons
+3. Ensure keyboard navigation works for new features
+4. Test with screen readers
+5. Verify color contrast meets AA standards
+6. Add focus styles to interactive elements
+
 ## 🐛 Known Issues
 
 - [ ] Resume PDF parsing not yet implemented (raw text import only)

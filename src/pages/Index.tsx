@@ -118,19 +118,21 @@ const Index = () => {
         />
         <Header />
       
-      <section className="bg-gradient-hero text-white py-20">
+      <main id="main-content">
+        <section className="bg-gradient-hero text-white py-20" aria-labelledby="hero-title">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">
+          <h1 id="hero-title" className="text-5xl font-bold mb-6">
             {t('home.title')}
           </h1>
           <p className="text-xl mb-8 opacity-90">
             {t('home.subtitle')}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8" role="search">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" aria-hidden="true" />
               <Input
+                type="search"
                 placeholder={t('home.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => {
@@ -140,52 +142,54 @@ const Index = () => {
                     trackSearchJobs({ query: value });
                   }
                 }}
-                className="pl-10 bg-white text-foreground"
+                className="pl-10 bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                aria-label={t('home.searchAriaLabel') || 'Search for jobs by title, location or company'}
               />
             </div>
             <Button 
               onClick={() => setShowJobForm(true)}
-              className="bg-accent hover:bg-accent/90 text-accent-foreground"
+              className="bg-accent hover:bg-accent/90 text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              aria-label={t('home.postJobAriaLabel') || 'Post a new job'}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
               {t('home.postJob')}
             </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
             <div className="text-center">
-              <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                 <Briefcase className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{t('home.simplePosting')}</h3>
+              <h2 className="text-xl font-semibold mb-2">{t('home.simplePosting')}</h2>
               <p className="opacity-90">{t('home.simplePostingDesc')}</p>
             </div>
             
             <div className="text-center">
-              <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                 <Users className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{t('home.fastResponses')}</h3>
+              <h2 className="text-xl font-semibold mb-2">{t('home.fastResponses')}</h2>
               <p className="opacity-90">{t('home.fastResponsesDesc')}</p>
             </div>
             
             <div className="text-center">
-              <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                 <TrendingUp className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{t('home.efficient')}</h3>
+              <h2 className="text-xl font-semibold mb-2">{t('home.efficient')}</h2>
               <p className="opacity-90">{t('home.efficientDesc')}</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16">
+      <section className="py-16" aria-labelledby="active-jobs-heading">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">
+            <h2 id="active-jobs-heading" className="text-3xl font-bold">
               {t('home.activeJobs')}
-              <span className="text-muted-foreground text-lg ml-2">
+              <span className="text-muted-foreground text-lg ml-2" aria-label={`${filteredJobs.length} ${t('home.jobsFound') || 'jobs found'}`}>
                 ({filteredJobs.length})
               </span>
             </h2>
@@ -202,8 +206,12 @@ const Index = () => {
               <div className="text-muted-foreground text-lg mb-4">
                 {searchTerm ? t('home.noJobsFound') : t('home.noJobs')}
               </div>
-              <Button onClick={() => setShowJobForm(true)} variant="outline">
-                <Plus className="w-4 h-4 mr-2" />
+              <Button 
+                onClick={() => setShowJobForm(true)} 
+                variant="outline"
+                className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
                 {t('home.postFirstJob')}
               </Button>
             </div>
@@ -227,6 +235,7 @@ const Index = () => {
           )}
         </div>
       </section>
+      </main>
 
       <Footer />
 
