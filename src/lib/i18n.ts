@@ -543,6 +543,7 @@ const resources = {
       "footer.copyright": "© 2024 LaburoGO. Plataforma simples para busca de emprego.",
       "footer.terms": "Termos de Uso",
       "footer.privacy": "Política de Privacidade",
+      "footer.contact": "Contato",
 
       // Vacancy
       "vacancy.salaryNegotiable": "Negociável",
@@ -772,6 +773,7 @@ const resources = {
       "footer.copyright": "© 2024 LaburoGO. Простая платформа для поиска работы.",
       "footer.terms": "Условия использования",
       "footer.privacy": "Политика конфиденциальности",
+      "footer.contact": "Контакты",
 
       // Vacancy
       "vacancy.salaryNegotiable": "По договоренности",
