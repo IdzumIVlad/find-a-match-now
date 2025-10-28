@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -9,15 +9,17 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, User, Briefcase, FileText, Database } from 'lucide-react';
+import { LogOut, User, Briefcase, FileText, Database, Plus } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import JobForm from '@/components/JobForm';
 import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [showJobForm, setShowJobForm] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -63,6 +65,16 @@ const Header = () => {
           </div>
           
           <div className="flex items-center gap-2" role="toolbar" aria-label={t('common.userActions') || 'User actions'}>
+            <Button 
+              onClick={() => setShowJobForm(true)}
+              variant="default"
+              size="sm"
+              className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              aria-label={t('home.postJobAriaLabel') || 'Post a new job'}
+            >
+              <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
+              {t('home.postJob')}
+            </Button>
             <LanguageSwitcher />
             <ThemeToggle />
             
@@ -123,6 +135,17 @@ const Header = () => {
         </div>
         </div>
       </header>
+
+      <JobForm
+        open={showJobForm}
+        onOpenChange={setShowJobForm}
+        onSubmit={() => {
+          setShowJobForm(false);
+          if (window.location.pathname === '/') {
+            window.location.reload();
+          }
+        }}
+      />
     </>
   );
 };

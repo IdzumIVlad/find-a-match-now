@@ -128,8 +128,8 @@ const Index = () => {
             {t('home.subtitle')}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8" role="search">
-            <div className="relative flex-1">
+          <div className="flex justify-center mb-8" role="search">
+            <div className="relative w-full max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" aria-hidden="true" />
               <Input
                 type="search"
@@ -146,14 +146,6 @@ const Index = () => {
                 aria-label={t('home.searchAriaLabel') || 'Search for jobs by title, location or company'}
               />
             </div>
-            <Button 
-              onClick={() => setShowJobForm(true)}
-              className="bg-accent hover:bg-accent/90 text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              aria-label={t('home.postJobAriaLabel') || 'Post a new job'}
-            >
-              <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
-              {t('home.postJob')}
-            </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
