@@ -99,11 +99,26 @@ const Index = () => {
     return date.toLocaleDateString("ru-RU");
   };
 
-  const formatSalary = (min?: number, max?: number) => {
+  const formatSalary = (min?: number, max?: number, currency?: string) => {
+    const getCurrencySymbol = (curr?: string) => {
+      const symbols: Record<string, string> = {
+        USD: '$',
+        ARS: '$',
+        BRL: 'R$',
+        RUB: '₽',
+        EUR: '€',
+        MXN: '$',
+        COP: '$',
+        CLP: '$',
+      };
+      return symbols[curr || 'USD'] || '$';
+    };
+    
+    const symbol = getCurrencySymbol(currency);
     if (!min && !max) return t('vacancy.salaryNegotiable');
-    if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()} ₽`;
-    if (min) return `${t('vacancy.salaryFrom')} ${min.toLocaleString()} ₽`;
-    if (max) return `${t('vacancy.salaryTo')} ${max.toLocaleString()} ₽`;
+    if (min && max) return `${symbol}${min.toLocaleString()} - ${symbol}${max.toLocaleString()}`;
+    if (min) return `${t('vacancy.salaryFrom')} ${symbol}${min.toLocaleString()}`;
+    if (max) return `${t('vacancy.salaryTo')} ${symbol}${max.toLocaleString()}`;
     return t('vacancy.salaryNegotiable');
   };
 
@@ -216,7 +231,8 @@ const Index = () => {
                   title={job.title}
                   companyName={job.companies?.name || 'Компания'}
                   location={job.location}
-                  salary={formatSalary(job.salary_min, job.salary_max)}
+                  salary={formatSalary(job.salary_min, job.salary_max, job.currency)}
+                  currency={job.currency}
                   type={job.employment_type}
                   description={job.description}
                   postedDate={formatDate(job.created_at)}

@@ -44,6 +44,7 @@ const JobForm = ({ open, onOpenChange, onSubmit, job }: JobFormProps) => {
     location: "",
     salary_min: "",
     salary_max: "",
+    currency: "USD",
     employment_type: "",
     description: "",
     requirements: "",
@@ -60,6 +61,7 @@ const JobForm = ({ open, onOpenChange, onSubmit, job }: JobFormProps) => {
           location: job.location || "",
           salary_min: job.salary_min?.toString() || "",
           salary_max: job.salary_max?.toString() || "",
+          currency: (job as any).currency || "USD",
           employment_type: job.employment_type || "",
           description: job.description || "",
           requirements: job.requirements || "",
@@ -72,6 +74,7 @@ const JobForm = ({ open, onOpenChange, onSubmit, job }: JobFormProps) => {
           location: "",
           salary_min: "",
           salary_max: "",
+          currency: "USD",
           employment_type: "",
           description: "",
           requirements: "",
@@ -116,6 +119,7 @@ const JobForm = ({ open, onOpenChange, onSubmit, job }: JobFormProps) => {
         location: formData.location || null,
         salary_min: formData.salary_min ? parseInt(formData.salary_min) : null,
         salary_max: formData.salary_max ? parseInt(formData.salary_max) : null,
+        currency: formData.currency,
         employment_type: formData.employment_type || null,
         description: formData.description || null,
         requirements: formData.requirements || null,
@@ -232,27 +236,48 @@ const JobForm = ({ open, onOpenChange, onSubmit, job }: JobFormProps) => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="salary_min">{t('form.salaryFrom')}</Label>
-              <Input
-                id="salary_min"
-                type="number"
-                value={formData.salary_min}
-                onChange={(e) => handleInputChange("salary_min", e.target.value)}
-                placeholder="50000"
-              />
+              <Label htmlFor="currency">{t('form.currency')}</Label>
+              <Select value={formData.currency} onValueChange={(value) => handleInputChange("currency", value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USD">🇺🇸 {t('currency.usd')} (USD)</SelectItem>
+                  <SelectItem value="ARS">🇦🇷 {t('currency.ars')} (ARS)</SelectItem>
+                  <SelectItem value="BRL">🇧🇷 {t('currency.brl')} (BRL)</SelectItem>
+                  <SelectItem value="RUB">🇷🇺 {t('currency.rub')} (RUB)</SelectItem>
+                  <SelectItem value="EUR">🇪🇺 {t('currency.eur')} (EUR)</SelectItem>
+                  <SelectItem value="MXN">🇲🇽 {t('currency.mxn')} (MXN)</SelectItem>
+                  <SelectItem value="COP">🇨🇴 {t('currency.cop')} (COP)</SelectItem>
+                  <SelectItem value="CLP">🇨🇱 {t('currency.clp')} (CLP)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="salary_max">{t('form.salaryTo')}</Label>
-              <Input
-                id="salary_max"
-                type="number"
-                value={formData.salary_max}
-                onChange={(e) => handleInputChange("salary_max", e.target.value)}
-                placeholder="150000"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="salary_min">{t('form.salaryFrom')}</Label>
+                <Input
+                  id="salary_min"
+                  type="number"
+                  value={formData.salary_min}
+                  onChange={(e) => handleInputChange("salary_min", e.target.value)}
+                  placeholder="50000"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="salary_max">{t('form.salaryTo')}</Label>
+                <Input
+                  id="salary_max"
+                  type="number"
+                  value={formData.salary_max}
+                  onChange={(e) => handleInputChange("salary_max", e.target.value)}
+                  placeholder="150000"
+                />
+              </div>
             </div>
           </div>
 

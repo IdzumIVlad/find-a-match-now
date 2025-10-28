@@ -10,6 +10,7 @@ interface JobCardProps {
   companyName: string;
   location: string;
   salary: string;
+  currency?: string;
   type: string;
   description: string;
   postedDate: string;
@@ -22,12 +23,41 @@ const JobCard = ({
   companyName,
   location,
   salary,
+  currency,
   type,
   description,
   postedDate,
   onApply,
 }: JobCardProps) => {
   const { t } = useTranslation();
+  
+  const getCurrencySymbol = (curr?: string) => {
+    const symbols: Record<string, string> = {
+      USD: '$',
+      ARS: '$',
+      BRL: 'R$',
+      RUB: '₽',
+      EUR: '€',
+      MXN: '$',
+      COP: '$',
+      CLP: '$',
+    };
+    return symbols[curr || 'USD'] || curr || '$';
+  };
+  
+  const formatSalaryDisplay = (salaryText: string, curr?: string) => {
+    // If salary already has a currency symbol, return as is
+    if (salaryText.includes('$') || salaryText.includes('₽') || salaryText.includes('€') || salaryText.includes('R$')) {
+      return salaryText;
+    }
+    // Check if it's "Negotiable" or similar
+    if (salaryText.toLowerCase().includes('negoc') || salaryText.toLowerCase().includes('договор')) {
+      return salaryText;
+    }
+    // Otherwise prepend the currency symbol
+    const symbol = getCurrencySymbol(curr);
+    return `${symbol}${salaryText}`;
+  };
   
   return (
     <Card className="bg-gradient-card shadow-card hover:shadow-hover transition-all duration-300 border-0 focus-within:ring-2 focus-within:ring-ring" data-testid="job-card">
@@ -56,7 +86,7 @@ const JobCard = ({
             <Badge variant="secondary" className="mb-2">
               {type}
             </Badge>
-            <p className="text-lg font-semibold text-primary">{salary}</p>
+            <p className="text-lg font-semibold text-primary">{formatSalaryDisplay(salary, currency)}</p>
           </div>
         </div>
       </CardHeader>

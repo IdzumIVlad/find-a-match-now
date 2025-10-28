@@ -22,6 +22,7 @@ interface Job {
   requirements: string;
   salary_min: number;
   salary_max: number;
+  currency?: string;
   created_at: string;
   companies: {
     id?: string;
@@ -93,11 +94,26 @@ const JobDetail = () => {
     fetchJob();
   }, [id, navigate]);
 
-  const formatSalary = (min?: number, max?: number) => {
+  const getCurrencySymbol = (currency?: string) => {
+    const symbols: Record<string, string> = {
+      USD: '$',
+      ARS: '$',
+      BRL: 'R$',
+      RUB: '₽',
+      EUR: '€',
+      MXN: '$',
+      COP: '$',
+      CLP: '$',
+    };
+    return symbols[currency || 'USD'] || currency || '$';
+  };
+
+  const formatSalary = (min?: number, max?: number, currency?: string) => {
+    const symbol = getCurrencySymbol(currency);
     if (!min && !max) return 'По договоренности';
-    if (min && max) return `${min.toLocaleString()} - ${max.toLocaleString()} ₽`;
-    if (min) return `от ${min.toLocaleString()} ₽`;
-    if (max) return `до ${max.toLocaleString()} ₽`;
+    if (min && max) return `${symbol}${min.toLocaleString()} - ${symbol}${max.toLocaleString()}`;
+    if (min) return `от ${symbol}${min.toLocaleString()}`;
+    if (max) return `до ${symbol}${max.toLocaleString()}`;
     return 'По договоренности';
   };
 
@@ -149,7 +165,7 @@ const JobDetail = () => {
     <div className="min-h-screen bg-background">
       <SEOHead 
         title={`${job.title} en ${job.companies?.name || 'compañía'}`}
-        description={truncateDescription(job.description) || `${job.title} en ${job.companies?.name}. ${job.location || 'Argentina'}. ${formatSalary(job.salary_min, job.salary_max)}. Aplica ahora.`}
+        description={truncateDescription(job.description) || `${job.title} en ${job.companies?.name}. ${job.location || 'Argentina'}. ${formatSalary(job.salary_min, job.salary_max, job.currency)}. Aplica ahora.`}
         type="job_posting"
         keywords={`trabajo, empleo, ${job.title}, ${job.companies?.name}, ${job.location || 'Argentina'}, ${job.employment_type || 'tiempo completo'}`}
         jobTitle={job.title}
@@ -198,7 +214,7 @@ const JobDetail = () => {
                     
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-4 w-4" />
-                      {formatSalary(job.salary_min, job.salary_max)}
+                      {formatSalary(job.salary_min, job.salary_max, job.currency)}
                     </div>
                     
                     <div className="flex items-center gap-1">

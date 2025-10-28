@@ -225,6 +225,7 @@ export type Database = {
         Row: {
           company_id: string
           created_at: string | null
+          currency: string | null
           description: string | null
           employment_type: string | null
           id: string
@@ -240,6 +241,7 @@ export type Database = {
         Insert: {
           company_id: string
           created_at?: string | null
+          currency?: string | null
           description?: string | null
           employment_type?: string | null
           id?: string
@@ -255,6 +257,7 @@ export type Database = {
         Update: {
           company_id?: string
           created_at?: string | null
+          currency?: string | null
           description?: string | null
           employment_type?: string | null
           id?: string
@@ -422,7 +425,7 @@ export type Database = {
           created_at: string | null
           error_message: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           table_name: string
           user_agent: string | null
           user_id: string | null
@@ -432,7 +435,7 @@ export type Database = {
           created_at?: string | null
           error_message?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           table_name: string
           user_agent?: string | null
           user_id?: string | null
@@ -442,7 +445,7 @@ export type Database = {
           created_at?: string | null
           error_message?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           table_name?: string
           user_agent?: string | null
           user_id?: string | null
@@ -473,6 +476,7 @@ export type Database = {
       vacancies: {
         Row: {
           created_at: string
+          currency: string | null
           description: string | null
           employer_id: string | null
           employment_type: string | null
@@ -486,6 +490,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          currency?: string | null
           description?: string | null
           employer_id?: string | null
           employment_type?: string | null
@@ -499,6 +504,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          currency?: string | null
           description?: string | null
           employer_id?: string | null
           employment_type?: string | null
@@ -554,22 +560,16 @@ export type Database = {
       }
     }
     Functions: {
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      get_current_user_role: { Args: never; Returns: string }
       get_job_contact_info: {
         Args: { job_id_param: string }
         Returns: {
           employer_email: string
         }[]
       }
-      get_job_employer_email: {
-        Args: { job_id: string }
-        Returns: string
-      }
+      get_job_employer_email: { Args: { job_id: string }; Returns: string }
       get_public_jobs: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           company_name: string
           created_at: string
@@ -584,7 +584,7 @@ export type Database = {
         }[]
       }
       get_public_jobs_safe: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           company_name: string
           created_at: string
@@ -599,7 +599,7 @@ export type Database = {
         }[]
       }
       get_public_resumes_safe: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           education: Json
@@ -634,10 +634,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       log_security_event: {
         Args: {
           action_name: string
@@ -648,10 +645,7 @@ export type Database = {
         }
         Returns: undefined
       }
-      validate_password_strength: {
-        Args: { password: string }
-        Returns: Json
-      }
+      validate_password_strength: { Args: { password: string }; Returns: Json }
     }
     Enums: {
       app_role: "candidate" | "employer" | "admin"

@@ -231,7 +231,18 @@ const resources = {
       "time.yesterday": "yesterday",
       "time.daysAgo": "{{count}} days ago",
       "time.created": "Created {{date}}",
-      "time.updated": "Updated {{date}}"
+      "time.updated": "Updated {{date}}",
+      
+      // Currency
+      "form.currency": "Currency",
+      "currency.usd": "US Dollar",
+      "currency.ars": "Argentine Peso",
+      "currency.brl": "Brazilian Real",
+      "currency.rub": "Russian Ruble",
+      "currency.eur": "Euro",
+      "currency.mxn": "Mexican Peso",
+      "currency.cop": "Colombian Peso",
+      "currency.clp": "Chilean Peso"
     }
   },
   es: {
@@ -461,7 +472,18 @@ const resources = {
       "time.yesterday": "ayer",
       "time.daysAgo": "hace {{count}} días",
       "time.created": "Creado {{date}}",
-      "time.updated": "Actualizado {{date}}"
+      "time.updated": "Actualizado {{date}}",
+      
+      // Currency
+      "form.currency": "Moneda",
+      "currency.usd": "Dólar estadounidense",
+      "currency.ars": "Peso argentino",
+      "currency.brl": "Real brasileño",
+      "currency.rub": "Rublo ruso",
+      "currency.eur": "Euro",
+      "currency.mxn": "Peso mexicano",
+      "currency.cop": "Peso colombiano",
+      "currency.clp": "Peso chileno"
     }
   },
   pt: {
@@ -691,7 +713,18 @@ const resources = {
       "time.yesterday": "ontem",
       "time.daysAgo": "há {{count}} dias",
       "time.created": "Criado {{date}}",
-      "time.updated": "Atualizado {{date}}"
+      "time.updated": "Atualizado {{date}}",
+      
+      // Currency
+      "form.currency": "Moeda",
+      "currency.usd": "Dólar americano",
+      "currency.ars": "Peso argentino",
+      "currency.brl": "Real brasileiro",
+      "currency.rub": "Rublo russo",
+      "currency.eur": "Euro",
+      "currency.mxn": "Peso mexicano",
+      "currency.cop": "Peso colombiano",
+      "currency.clp": "Peso chileno"
     }
   },
   ru: {
@@ -921,7 +954,18 @@ const resources = {
       "time.yesterday": "вчера",
       "time.daysAgo": "{{count}} дня назад",
       "time.created": "Создано {{date}}",
-      "time.updated": "Обновлено {{date}}"
+      "time.updated": "Обновлено {{date}}",
+      
+      // Currency
+      "form.currency": "Валюта",
+      "currency.usd": "Доллар США",
+      "currency.ars": "Аргентинское песо",
+      "currency.brl": "Бразильский реал",
+      "currency.rub": "Российский рубль",
+      "currency.eur": "Евро",
+      "currency.mxn": "Мексиканское песо",
+      "currency.cop": "Колумбийское песо",
+      "currency.clp": "Чилийское песо"
     }
   }
 };
