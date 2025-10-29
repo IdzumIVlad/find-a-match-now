@@ -85,6 +85,23 @@ const resources = {
       "footer.privacy": "Privacy Policy",
       "footer.contact": "Contact",
 
+      // Filters
+      "filters.title": "Filters",
+      "filters.description": "Refine your job search",
+      "filters.salary": "Salary Range",
+      "filters.location": "Location",
+      "filters.country": "Country",
+      "filters.city": "City",
+      "filters.employmentType": "Employment Type",
+      "filters.selectType": "Select type",
+      "filters.apply": "Apply Filters",
+
+      // Employment Type
+      "employmentType.fullTime": "Full-time",
+      "employmentType.partTime": "Part-time",
+      "employmentType.contract": "Contract",
+      "employmentType.freelance": "Freelance",
+
       // Vacancy
       "vacancy.salaryNegotiable": "Negotiable",
       "vacancy.salaryFrom": "from",
@@ -325,6 +342,23 @@ const resources = {
       "footer.terms": "Términos de Uso",
       "footer.privacy": "Política de Privacidad",
       "footer.contact": "Contacto",
+
+      // Filters
+      "filters.title": "Filtros",
+      "filters.description": "Refina tu búsqueda de empleo",
+      "filters.salary": "Rango Salarial",
+      "filters.location": "Ubicación",
+      "filters.country": "País",
+      "filters.city": "Ciudad",
+      "filters.employmentType": "Tipo de Empleo",
+      "filters.selectType": "Seleccionar tipo",
+      "filters.apply": "Aplicar Filtros",
+
+      // Employment Type
+      "employmentType.fullTime": "Tiempo completo",
+      "employmentType.partTime": "Medio tiempo",
+      "employmentType.contract": "Contrato",
+      "employmentType.freelance": "Freelance",
 
       // Vacancy
       "vacancy.salaryNegotiable": "Negociable",
@@ -567,6 +601,23 @@ const resources = {
       "footer.privacy": "Política de Privacidade",
       "footer.contact": "Contato",
 
+      // Filters
+      "filters.title": "Filtros",
+      "filters.description": "Refine sua busca de emprego",
+      "filters.salary": "Faixa Salarial",
+      "filters.location": "Localização",
+      "filters.country": "País",
+      "filters.city": "Cidade",
+      "filters.employmentType": "Tipo de Emprego",
+      "filters.selectType": "Selecionar tipo",
+      "filters.apply": "Aplicar Filtros",
+
+      // Employment Type
+      "employmentType.fullTime": "Tempo integral",
+      "employmentType.partTime": "Meio período",
+      "employmentType.contract": "Contrato",
+      "employmentType.freelance": "Freelance",
+
       // Vacancy
       "vacancy.salaryNegotiable": "Negociável",
       "vacancy.salaryFrom": "a partir de",
@@ -807,6 +858,23 @@ const resources = {
       "footer.terms": "Условия использования",
       "footer.privacy": "Политика конфиденциальности",
       "footer.contact": "Контакты",
+
+      // Filters
+      "filters.title": "Фильтры",
+      "filters.description": "Уточните поиск работы",
+      "filters.salary": "Диапазон зарплаты",
+      "filters.location": "Местоположение",
+      "filters.country": "Страна",
+      "filters.city": "Город",
+      "filters.employmentType": "Тип занятости",
+      "filters.selectType": "Выберите тип",
+      "filters.apply": "Применить фильтры",
+
+      // Employment Type
+      "employmentType.fullTime": "Полная занятость",
+      "employmentType.partTime": "Частичная занятость",
+      "employmentType.contract": "Контракт",
+      "employmentType.freelance": "Фриланс",
 
       // Vacancy
       "vacancy.salaryNegotiable": "По договоренности",

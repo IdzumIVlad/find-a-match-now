@@ -7,6 +7,7 @@ import JobForm from "@/components/JobForm";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompleteProfileModal from "@/components/CompleteProfileModal";
+import { JobFilters, JobFiltersType } from "@/components/JobFilters";
 import { Plus, Search, Briefcase, Users, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +23,7 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showJobForm, setShowJobForm] = useState(false);
   const [showCompleteProfile, setShowCompleteProfile] = useState(false);
+  const [filters, setFilters] = useState<JobFiltersType>({});
   const { toast } = useToast();
   const { user, profile, loading: authLoading, fetchProfile } = useAuth();
   const navigate = useNavigate();
@@ -73,11 +75,33 @@ const Index = () => {
     fetchJobs();
   }, []);
 
-  const filteredJobs = jobs.filter(job =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (job.companies?.name && job.companies.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredJobs = jobs.filter(job => {
+    // Search term filter
+    const matchesSearch = !searchTerm || 
+      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (job.companies?.name && job.companies.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    // Salary filter
+    const matchesSalary = (!filters.salaryMin || !job.salary_min || job.salary_min >= filters.salaryMin) &&
+      (!filters.salaryMax || !job.salary_max || job.salary_max <= filters.salaryMax);
+
+    // Currency filter
+    const matchesCurrency = !filters.currency || !job.currency || job.currency === filters.currency;
+
+    // Location filter
+    const matchesCountry = !filters.country || 
+      (job.location && job.location.toLowerCase().includes(filters.country.toLowerCase()));
+    
+    const matchesCity = !filters.city || 
+      (job.location && job.location.toLowerCase().includes(filters.city.toLowerCase()));
+
+    // Employment type filter
+    const matchesEmploymentType = !filters.employmentType || 
+      job.employment_type === filters.employmentType;
+
+    return matchesSearch && matchesSalary && matchesCurrency && matchesCountry && matchesCity && matchesEmploymentType;
+  });
 
   const handleAddJob = () => {
     fetchJobs();
@@ -144,22 +168,25 @@ const Index = () => {
           </p>
           
           <div className="flex justify-center mb-8" role="search">
-            <div className="relative w-full max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" aria-hidden="true" />
-              <Input
-                type="search"
-                placeholder={t('home.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setSearchTerm(value);
-                  if (value) {
-                    trackSearchJobs({ query: value });
-                  }
-                }}
-                className="pl-10 bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                aria-label={t('home.searchAriaLabel') || 'Search for jobs by title, location or company'}
-              />
+            <div className="flex gap-2 w-full max-w-2xl">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" aria-hidden="true" />
+                <Input
+                  type="search"
+                  placeholder={t('home.searchPlaceholder')}
+                  value={searchTerm}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSearchTerm(value);
+                    if (value) {
+                      trackSearchJobs({ query: value });
+                    }
+                  }}
+                  className="pl-10 bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  aria-label={t('home.searchAriaLabel') || 'Search for jobs by title, location or company'}
+                />
+              </div>
+              <JobFilters filters={filters} onFiltersChange={setFilters} />
             </div>
           </div>
 
